@@ -9,14 +9,13 @@
 
 <p align="center">
   <a href="#setup"><img alt="TypeScript" src="https://img.shields.io/badge/server-typescript-3178C6?style=flat-square&logo=typescript&logoColor=white" /></a>
-  <a href="#setup"><img alt="React" src="https://img.shields.io/badge/dashboard-react-61DAFB?style=flat-square&logo=react&logoColor=black" /></a>
   <a href="#database"><img alt="PostgreSQL" src="https://img.shields.io/badge/database-postgres%20%2B%20pgvector-4169E1?style=flat-square&logo=postgresql&logoColor=white" /></a>
   <a href="#hardware"><img alt="ESP32" src="https://img.shields.io/badge/firmware-esp32--s3-E7352C?style=flat-square&logo=espressif&logoColor=white" /></a>
   <a href="#the-simulator"><img alt="Three.js" src="https://img.shields.io/badge/simulator-three.js-000000?style=flat-square&logo=threedotjs&logoColor=white" /></a>
 </p>
 
 
-> **⚠️ Honest framing.** Vision is my final year scale robot with a real, persistent brain, not a product. Everything in the simulator runs without hardware, simulator endpoints are refused when the server is in `hardware` mode, so they can never touch the real robot. The optional AI features need an API key and have **not been tested against a real model in the build environment**: with no key, the robot falls back to its built-in local mind. The decision weights in the Autonomous mind are hand-tuned, not trained.
+> **⚠️ Honest framing.** Vision is my final year scale robot with a real, persistent brain. Everything in the simulator runs without hardware, simulator endpoints are refused when the server is in `hardware` mode, so they can never touch the real robot. The optional AI features need an API key and have **not been tested against a real model in the build environment**: with no key, the robot falls back to its built-in local mind. The decision weights in the Autonomous mind are hand-tuned, not trained.
 
 
 ## Table of contents
