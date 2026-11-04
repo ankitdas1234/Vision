@@ -13,17 +13,17 @@ const Footer = () => {
     {
       title: "Features",
       links: [
-        { name: "Traffic", path: "/" },
-        { name: "Contributions", path: "/" },
-        { name: "Pull requests", path: "/" },
-        { name: "Issues", path: "/" },
+        { name: "Traffic", path: "https://github.com/arijiiiitttt/Vision/graphs/traffic" },
+        { name: "Contributions", path: "https://github.com/arijiiiitttt/Vision/graphs/contributors?from=8%2F1%2F2026" },
+        { name: "Pull requests", path: "https://github.com/arijiiiitttt/Vision/pulls" },
+        { name: "Issues", path: "https://github.com/arijiiiitttt/Vision/issues" },
         { name: "Profiles", path: "/dashboard" },
       ],
     },
     {
       title: "Company",
       links: [
-        { name: "Contact", path: "/" },
+        { name: "Contact", path: "https://www.linkedin.com/in/arijiiiitttt/" },
         { name: "Blog", path: "/blog" },
         { name: "Privacy", path: "/" },
         { name: "Terms", path: "/" },
@@ -31,7 +31,7 @@ const Footer = () => {
     },
     {
       title: "Compare",
-      links: [{ name: "GitHub Insights", path: "/" }],
+      links: [{ name: "GitHub Insights", path: "https://github.com/arijiiiitttt/Vision/graphs/contributors?from=8%2F1%2F2026" }],
     },
   ];
   return (
