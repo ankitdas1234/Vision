@@ -33,8 +33,9 @@
 10. [Database](#database)
 11. [Authentication](#authentication)
 12. [Services and endpoints](#services-and-endpoints)
-13. [Testing](#testing)
-14. [Control mode and Vision Script](#control-mode-and-vision-script)
+13. [Control mode and Vision Script](#control-mode-and-vision-script)
+14. [Testing](#testing)
+
 
 
 
@@ -277,26 +278,6 @@ Simulator and memory endpoints (all refused in hardware mode where they touch th
 | `POST /api/memory/dynamic/:id/verify`, `/reject` | ADMIN | Review AI-learned facts |
 
 
-
-## Testing
-
-```bash
-npm test
-```
-
-| Area | Covered |
-|---|---|
-| Perception | Person tracking (left, right, centred, lost) |
-| Movement | Continuous and positional servo control, gait phases |
-| Safety | Emergency stop, authorization, role hierarchy |
-| Memory | Priority chain, teaching routes (against a fake and a real Postgres), restart persistence |
-| Simulator | Voice commands and music, the human-like mind (clock, plans, relationships, goals), saved-mind routes |
-| Compiler | Kill-switch default, valid and invalid Vision Script |
-
-In the build sandbox 4 tests fail only because ffmpeg and two native add-ons are missing there (`audioTranscode`, `omnivoice`, `tts`, `personEncounterService`, `visionPipeline`); they should pass on a normal machine.
-
-
-
 ## Control mode and Vision Script
 
 | Mode | Behavior |
@@ -316,3 +297,18 @@ STOP, CENTER, SAFE and Emergency Stop work in either mode. Vision Script is a sm
 | `AUDIO_SPEAK "Hello"` | Speaks the text |
 | `REPEAT 4 TIMES ... END` | Bounded loop |
 
+
+## Testing
+
+```bash
+npm test
+```
+
+| Area | Covered |
+|---|---|
+| Perception | Person tracking (left, right, centred, lost) |
+| Movement | Continuous and positional servo control, gait phases |
+| Safety | Emergency stop, authorization, role hierarchy |
+| Memory | Priority chain, teaching routes (against a fake and a real Postgres), restart persistence |
+| Simulator | Voice commands and music, the human-like mind (clock, plans, relationships, goals), saved-mind routes |
+| Compiler | Kill-switch default, valid and invalid Vision Script |
