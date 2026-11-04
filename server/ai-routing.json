@@ -1,0 +1,20 @@
+{
+  "_readme": "Ordered list of models per request type. The first available model answers; if it is out of quota, rate limited or down, the next one answers silently. Providers without an API key are skipped. ${NAME} / ${NAME:-default} are read from the environment. Delete this file to use the built-in defaults.",
+  "routes": {
+    "text": [
+      { "provider": "openrouter", "model": "${OPENROUTER_MODEL}" },
+      { "provider": "llm", "model": "${LLM_MODEL}" },
+      { "provider": "gemini", "model": "${GEMINI_MODEL:-gemini-2.0-flash}" },
+      { "provider": "openai", "model": "${OPENAI_MODEL:-gpt-4o-mini}" },
+      { "provider": "xai", "model": "${XAI_MODEL:-grok-2-latest}" },
+      { "provider": "anthropic", "model": "${ANTHROPIC_MODEL:-claude-3-5-haiku-latest}" }
+    ],
+    "image": [
+      { "provider": "openrouter", "model": "${OPENROUTER_VISION_MODEL}" },
+      { "provider": "llm", "model": "${LLM_VISION_MODEL:-${LLM_MODEL}}" },
+      { "provider": "gemini", "model": "${GEMINI_MODEL:-gemini-2.0-flash}" },
+      { "provider": "openai", "model": "${OPENAI_VISION_MODEL:-gpt-4o-mini}" },
+      { "provider": "anthropic", "model": "${ANTHROPIC_VISION_MODEL:-claude-3-5-sonnet-latest}" }
+    ]
+  }
+}

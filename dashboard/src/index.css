@@ -1,5 +1,28 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+:root {
+  /* Dark theme (default) — values are "R G B" triplets so Tailwind's
+   * <alpha-value> opacity modifiers (e.g. bg-vision-accent/15) work. */
+  --vision-bg: 11 15 20;       /* #0b0f14 */
+  --vision-panel: 18 24 33;    /* #121821 */
+  --vision-code: 0 0 0;        /* terminal/code panels stay dark in both themes on purpose */
+  --vision-border: 255 255 255; /* used with low alpha, e.g. /5, /10 */
+  --vision-hover: 255 255 255;  /* same */
+  --vision-text: 226 232 240;   /* slate-200-ish */
+  --vision-muted: 100 116 139;  /* slate-500-ish */
+}
+
+.light {
+  --vision-bg: 246 247 249;     /* soft off-white, not stark white */
+  --vision-panel: 255 255 255;
+  --vision-code: 24 24 27;      /* terminal panel stays dark even in light mode, like most code editors */
+  --vision-border: 15 23 42;    /* dark, used at low alpha for hairline borders on a light bg */
+  --vision-hover: 15 23 42;
+  --vision-text: 15 23 42;      /* slate-900-ish */
+  --vision-muted: 100 116 139;  /* slate-500 reads fine on both backgrounds */
+}
 
 @font-face {
   font-family:Cooll ;
@@ -8,3 +31,110 @@
 .cool{
   font-family:Cooll,sans-serif;
 }
+
+@font-face {
+  font-family:dm1;
+  src: url(/fonts/DM_Sans/dm1.ttf);
+}
+.dm1{
+  font-family:dm1,sans-serif;
+}
+
+@font-face {
+  font-family:dm2;
+  src: url(/fonts/DM_Sans/dm2.ttf);
+}
+.dm2{
+  font-family:dm2,sans-serif;
+}
+
+@font-face {
+  font-family:x1 ;
+  src: url(/fonts/x1.woff2);
+}
+.x1{
+  font-family:x1,sans-serif;
+}
+
+@font-face {
+  font-family:x2 ;
+  src: url(/fonts/x2.woff2);
+}
+.x2{
+  font-family:x2,sans-serif;
+}
+
+@font-face {
+  font-family:x3 ;
+  src: url(/fonts/x3.woff2);
+}
+.x3{
+  font-family:x3,sans-serif;
+}
+
+@font-face {
+  font-family:x4 ;
+  src: url(/fonts/x4.woff2);
+}
+.x4{
+  font-family:x4,sans-serif;
+}
+
+@layer base{
+  :root,html {
+    font-family: 'Cooll', system-ui, -apple-system, sans-serif;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; 
+}
+
+body { font-family: ui-sans-serif, system-ui, sans-serif; background-color: rgb(var(--vision-bg)); color: rgb(var(--vision-text)); }
+.card { @apply bg-vision-panel rounded-xl p-4 border border-vision-border/5 shadow-sm; }
+.badge { @apply px-2 py-0.5 rounded-full text-xs font-medium; }
+
+/* Custom scrollbar sizing */
+::-webkit-scrollbar {
+  width: 6px;  /* Vertical scrollbar width */
+  height: 6px; /* Horizontal scrollbar height */
+}
+
+/* Track background */
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+/* Scrollbar handle */
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* Light gray color (Tailwind's slate-300) */
+  border-radius: 9999px; /* Fully rounded capsule look */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* Darker gray on hover (Tailwind's slate-400) */
+}
+
+/* sign-in / create-account card fades and rises in (MailMint style) */
+@keyframes authIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.auth-in{animation:authIn .35s ease-out}
+@media (prefers-reduced-motion:reduce){.auth-in{animation:none}}
+
+/* Top-bar status icons (small looping animations; off when the system asks for reduced motion) */
+@keyframes tbWiggle{0%,60%,100%{transform:rotate(0)}10%{transform:rotate(-14deg)}20%{transform:rotate(12deg)}30%{transform:rotate(-8deg)}40%{transform:rotate(5deg)}}
+@keyframes tbPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.18);opacity:.75}}
+@keyframes tbSpin{to{transform:rotate(360deg)}}
+@keyframes tbBlink{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes tbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes tbShake{0%,80%,100%{transform:translateX(0)}84%{transform:translateX(-2px)}88%{transform:translateX(2px)}92%{transform:translateX(-2px)}96%{transform:translateX(1px)}}
+.tb-wiggle{animation:tbWiggle 3.2s ease-in-out infinite;transform-origin:50% 80%}
+.tb-pulse{animation:tbPulse 1.8s ease-in-out infinite}
+.tb-spin{animation:tbSpin 6s linear infinite}
+.tb-spin-fast{animation:tbSpin 1s linear infinite}
+.tb-blink{animation:tbBlink 1.6s ease-in-out infinite}
+.tb-float{animation:tbFloat 2s ease-in-out infinite}
+.tb-shake{animation:tbShake 3s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.tb-wiggle,.tb-pulse,.tb-spin,.tb-spin-fast,.tb-blink,.tb-float,.tb-shake{animation:none}}

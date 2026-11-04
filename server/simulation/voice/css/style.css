@@ -1,0 +1,240 @@
+:root {
+  --bg: #09090b;
+  --bg-elev: #0c0c0e;
+  --surface: #111113;
+  --surface-2: #161618;
+  --border: #222226;
+  --border-2: #2c2c32;
+  --text: #f4f4f5;
+  --text-2: #a1a1aa;
+  --text-3: #71717a;
+  --good: #22c55e;
+  --bad: #ef4444;
+  --warn: #eab308;
+  --purple: #a78bfa;
+  --font: "DM Sans", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --radius: 10px;
+  --radius-sm: 7px;
+}
+* , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.011em;
+}
+
+/* ── Loud banner shown only when opened as file:// instead of via the server ── */
+.proto-banner {
+  display: none;
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(9,9,11,0.96);
+  color: var(--text);
+  align-items: center; justify-content: center;
+  text-align: center; padding: 24px;
+  font-size: 14.5px; line-height: 1.6;
+}
+.proto-banner code {
+  font-family: var(--mono); background: var(--surface-2);
+  padding: 2px 6px; border-radius: 5px; font-size: 13px;
+}
+.proto-banner strong { display: block; font-size: 16px; margin-bottom: 8px; }
+.proto-banner.show { display: flex; }
+
+/* ── Header ── */
+.header {
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  z-index: 20;
+}
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--surface-2); border: 1px solid var(--border-2);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.brand-icon img { width: 100%; height: 100%; object-fit: cover; }
+.brand-name { font-weight: 600; font-size: 14.5px; }
+.brand-sub { font-size: 11.5px; color: var(--text-3); }
+
+.status-pill {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--border-2);
+  font-size: 12.5px; color: var(--text-2);
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+.dot.good { background: var(--good); box-shadow: 0 0 6px rgba(34,197,94,0.6); }
+.dot.warn { background: var(--warn); }
+.dot.bad { background: var(--bad); }
+
+.header .spacer { flex: 1; }
+.badge {
+  font-family: var(--mono); font-size: 11px; color: var(--text-3);
+  padding: 5px 9px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border);
+}
+.badge.warn { color: var(--warn); border-color: rgba(234,179,8,0.35); }
+
+/* ── Full-bleed 3D stage ── */
+.main { flex: 1; display: flex; position: relative; min-height: 0; overflow: hidden; }
+.stage-panel {
+  flex: 1; position: relative;
+  background: var(--bg);
+}
+#stage3d { position: absolute; inset: 0; cursor: grab; }
+#stage3d canvas { display: block; }
+.model-loading {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: var(--text-3); font-size: 13px; font-family: var(--mono);
+}
+.body-state {
+  position: absolute; left: 16px; top: 16px;
+  font-family: var(--mono); font-size: 12px; color: var(--text-2);
+  background: rgba(17,17,19,0.75); border: 1px solid var(--border-2);
+  padding: 6px 10px; border-radius: 7px; backdrop-filter: blur(6px);
+}
+
+/* ── Caption: side toaster — appears, then fades ── */
+.caption {
+  position: absolute;
+  right: auto;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(320px, 72vw);
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(17,17,19,0.92);
+  border: 1px solid var(--border-2);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+  font-size: 13.5px;
+  line-height: 1.45;
+  text-align: left;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+  z-index: 15;
+}
+.caption.show {
+  opacity: 1;
+  transform: translateX(-50%);
+}
+.caption .who {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 4px;
+}
+.caption.user .who { color: var(--purple); }
+.caption.assistant .who { color: var(--good); }
+
+/* ── Mic dock, bottom center ── */
+.mic-dock {
+  position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.mic-btn {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--border-2); color: var(--text-2);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 22px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+  transition: background .15s, color .15s, box-shadow .15s, transform .1s;
+}
+.mic-btn:hover { color: var(--text); transform: translateY(-1px); }
+.mic-btn:active { transform: translateY(0); }
+.mic-btn.live {
+  background: var(--good); color: #06210f;
+  box-shadow: 0 0 0 6px rgba(34,197,94,0.18), 0 6px 24px rgba(0,0,0,0.4);
+  animation: pulse-ring 1.6s ease-out infinite;
+}
+.mic-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.35), 0 6px 24px rgba(0,0,0,0.4); }
+  100% { box-shadow: 0 0 0 12px rgba(34,197,94,0), 0 6px 24px rgba(0,0,0,0.4); }
+}
+.mic-hint { font-size: 11.5px; color: var(--text-3); }
+
+/* ── Bottom action buttons & fallback input ── */
+.stage-actions {
+  position: absolute; right: 16px; bottom: 34px;
+  display: flex; align-items: center; gap: 10px;
+  z-index: 25;
+}
+.action-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--border-2); color: var(--text-2);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: background .15s, color .15s, border-color .15s, transform .1s, box-shadow .15s;
+}
+.action-btn:hover { color: var(--text); border-color: var(--purple); transform: translateY(-1px); }
+.action-btn:active { transform: translateY(0); }
+.action-btn.active {
+  background: rgba(167, 139, 250, 0.2);
+  border-color: var(--purple);
+  color: var(--purple);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.35);
+}
+
+.fallback-input {
+  display: none;
+  position: absolute; left: 50%; bottom: 112px; transform: translateX(-50%);
+  width: min(420px, 88vw);
+  gap: 8px;
+}
+.fallback-input.show { display: flex; }
+.fallback-input input {
+  flex: 1; background: var(--surface); border: 1px solid var(--border-2); color: var(--text);
+  border-radius: 8px; padding: 10px 12px; font-size: 13.5px; font-family: var(--font); outline: none;
+}
+.fallback-input input:focus { border-color: var(--purple); }
+.fallback-input button {
+  width: 38px; height: 38px; border-radius: 8px; background: var(--surface-2);
+  border: 1px solid var(--border-2); color: var(--text-2); cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.fallback-input button:hover { color: var(--text); }
+
+.support-warning {
+  display: none;
+  position: absolute; left: 50%; top: 16px; transform: translateX(-50%);
+  max-width: min(420px, 88vw);
+  padding: 8px 10px; font-size: 12px; text-align: center;
+  color: var(--warn); background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.3);
+  border-radius: 8px;
+}
+.support-warning .fallback-toggle {
+  display: block; margin: 6px auto 0; background: none; border: 1px solid rgba(234,179,8,0.4);
+  color: var(--warn); padding: 3px 9px; border-radius: 6px; font-size: 11.5px; cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  /* .caption { top: 12px; right: 12px; max-width: min(280px, 80vw); } */
+  .caption {
+  top: 12px;
+  left: 50%;
+  right: auto;
+  width: min(420px, 80vw);
+  max-width: 80vw;
+  transform: translateX(-50%);
+}
+  .mic-dock { bottom: 24px; }
+  .stage-actions { bottom: 24px; }
+}

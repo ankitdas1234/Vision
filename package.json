@@ -8,13 +8,16 @@
     "build:server": "npm run build --prefix server",
     "build:dashboard": "npm run build --prefix dashboard",
     "build": "npm run build --prefix server && npm run build --prefix dashboard",
+    "build:sim": "npm run build:sim --prefix server",
+    "build:render": "npm run build:sim --prefix server && npm run build --prefix server",
     "setup": "node scripts/setup.js",
     "seed": "node scripts/seed.js",
-    "seed:admin": "node scripts/create-admin.js",
     "migrate": "node scripts/migrate.js",
-    "test": "vitest run"
+    "create-admin": "node scripts/create-admin.js",
+    "test": "node scripts/test.js",
+    "verify": "node scripts/verify.js"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3"
+    "bcryptjs": "^2.4.3"
   }
 }

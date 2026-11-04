@@ -1,0 +1,38 @@
+{
+  "_help": "The arena starts EMPTY. Place things with the Lab > Map tab (they are kept in this browser), or list them here. Each object: id (unique), shape (box|cylinder|sphere|cone) OR url (a .glb/.gltf), x and z in robot-sizes (x = right, z = forward), size, color (hex), rotY (radians), solid (he walks around it, default true), known (he can see it and walk to it), role:'charger' (where he recharges). zones: hot/cold discs (x, z, r). See _example below; copy what you want into objects/zones.",
+  "objects": [],
+  "zones": [],
+  "_example": {
+    "objects": [
+      {
+        "id": "crate",
+        "name": "crate",
+        "shape": "box",
+        "x": 12,
+        "z": -14,
+        "size": 2.5,
+        "color": "#b45309",
+        "known": true
+      },
+      {
+        "id": "charger",
+        "shape": "cylinder",
+        "x": -22,
+        "z": -18,
+        "size": 1.2,
+        "color": "#22c55e",
+        "solid": false,
+        "known": true,
+        "role": "charger"
+      }
+    ],
+    "zones": [
+      {
+        "x": 22,
+        "z": 10,
+        "r": 6,
+        "temp": "hot"
+      }
+    ]
+  }
+}

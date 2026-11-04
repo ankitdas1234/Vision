@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Vision — Simulation</title>
+<link rel="icon" type="image/png" href="./assets/logo/Vision.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./css/shell.css" />
+</head>
+<body>
+<!-- sim client: shell. Hosts the Compiler, Autonomous, Voice and Live link views. -->
+
+<header class="bar" id="bar">
+  <a class="brand" href="./" title="Vision simulation">
+    <img src="./assets/logo/Vision.png" alt="" />
+    <div><b>Vision</b><span>simulation</span></div>
+  </a>
+
+  <!-- The mode toggle switch: Compiler  <->  Autonomous -->
+  <div class="mode" role="group" aria-label="Simulation mode">
+    <button class="mode-label on" id="lblCompiler" data-mode="compiler" type="button">Compiler</button>
+    <button class="switch" id="modeSwitch" role="switch" aria-checked="false" aria-label="Autonomous mode" type="button">
+      <span class="knob"></span>
+    </button>
+    <button class="mode-label" id="lblAutonomous" data-mode="autonomous" type="button">Autonomous</button>
+  </div>
+
+  <!-- Autonomous-only controls: shown while the Autonomous view is up, hidden in Compiler / Voice / Live link.
+       The Autonomous page wires them up itself (same ids), so its own header is not shown when it sits in here. -->
+  <span class="vsep mind" aria-hidden="true"></span>
+  <div class="mind" id="mindLeft">
+    <div class="seg" id="modeSeg" role="group" aria-label="Mind mode">
+      <button type="button" data-mode="off" title="Mind off: he stands still"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>Off</button>
+      <button type="button" data-mode="local" class="on" title="Local mind: runs in this page, works offline"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5"/><path d="M9.5 2.5v3M14.5 2.5v3M9.5 18.5v3M14.5 18.5v3M2.5 9.5h3M2.5 14.5h3M18.5 9.5h3M18.5 14.5h3"/></svg>Local mind</button>
+      <button type="button" data-mode="ai" title="AI mind: the language model phrases what he says"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l1.9 5.4 5.4 1.9-5.4 1.9L12 18.1l-1.9-5.4-5.4-1.9 5.4-1.9z"/><path d="M19 3v3M17.5 4.5h3"/></svg>AI mind</button>
+    </div>
+    <label class="fm" id="faceModelLbl" title="Switch the face model. Different models make different fingerprints, so people taught with one may not be recognised by the other.">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="11" r="3"/><path d="M7 17c1-2.2 2.8-3 5-3s4 .8 5 3"/></svg>
+      <span>Face model</span><b id="faceModelName">face-api</b>
+      <input type="checkbox" id="faceModelToggle" role="switch" aria-label="Face model" />
+    </label>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="mind" id="mindRight">
+    <div class="badge" id="llmBadge"><i></i><span>LLM: checking…</span></div>
+    <button type="button" class="help-btn" id="helpBtn" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">?</button>
+    <button type="button" class="estop" id="estop" title="Emergency stop (Esc)">E-STOP</button>
+  </div>
+
+  <!-- Voice and Live link are opened from the Autonomous page's Capabilities; this chip shows which one is open and closes it. -->
+  <button class="ov-chip" id="ovChip" type="button" hidden title="Close and go back"><span id="ovName">Voice</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  <div class="sync" id="sync" title="">
+    <i></i><span id="syncText">connecting…</span>
+  </div>
+  <span class="sim-chip" title="Nothing in this page can move the real robot">SIMULATION ONLY</span>
+</header>
+
+<div class="notice" id="notice"></div>
+
+<main class="views">
+  <iframe id="frameCompiler"   class="view on" title="Compiler simulation" allow="autoplay" data-src="./compiler/index.html"></iframe>
+  <iframe id="frameAutonomous" class="view"    title="Autonomous simulation" allow="camera; microphone; autoplay; fullscreen" data-src="./autonomous/index.html"></iframe>
+  <iframe id="frameVoice"      class="view"    title="Voice simulation" allow="microphone; autoplay" data-src="./voice/index.html"></iframe>
+  <iframe id="frameLive"       class="view"    title="Live link simulation" allow="microphone; autoplay" data-src="./live/index.html"></iframe>
+</main>
+
+<script type="module" src="./js/shell.js"></script>
+</body>
+</html>

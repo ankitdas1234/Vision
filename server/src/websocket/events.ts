@@ -1,0 +1,22 @@
+/** Canonical Socket.IO event name catalog — single source of truth for emit/on calls. */
+export const SOCKET_EVENTS = {
+  ROBOT_STATUS: "robot:status", ROBOT_HEARTBEAT: "robot:heartbeat",
+  CAMERA_CAPTURE: "camera:capture", CAMERA_PROCESSED: "camera:processed",
+  PERSON_DETECTED: "person:detected", PERSON_RECOGNIZED: "person:recognized", PERSON_TRACKING: "person:tracking",
+  OBJECT_DETECTED: "object:detected", OBJECT_UNKNOWN: "object:unknown",
+  MEMORY_SEARCHED: "memory:searched", MEMORY_MATCHED: "memory:matched", MEMORY_LEARNED: "memory:learned",
+  CONCEPTUAL_SEARCH: "conceptual:search", CONCEPTUAL_RESULT: "conceptual:result",
+  AI_STARTED: "ai:started", AI_COMPLETED: "ai:completed", AI_FAILED: "ai:failed",
+  BRAIN_DECISION: "brain:decision",
+  MENTAL_STATE: "mental:state", MENTAL_CURIOSITY: "mental:curiosity", MENTAL_JUDGEMENT: "mental:judgement",
+  REACTION_SELECTED: "reaction:selected",
+  COMMAND_CREATED: "command:created", COMMAND_VALIDATED: "command:validated", COMMAND_REJECTED: "command:rejected",
+  COMMAND_STARTED: "command:started", COMMAND_COMPLETED: "command:completed", COMMAND_FAILED: "command:failed",
+  GAIT_STARTED: "gait:started", GAIT_PHASE: "gait:phase", GAIT_STOPPED: "gait:stopped",
+  TASK_CREATED: "task:created", TASK_UPDATED: "task:updated", TASK_COMPLETED: "task:completed",
+  TASK_FAILED: "task:failed", TASK_CANCELLED: "task:cancelled",
+  TELEMETRY_UPDATE: "telemetry:update",
+  SAFETY_EVENT: "safety:event",
+  COMPILER_STARTED: "compiler:started", COMPILER_COMPLETED: "compiler:completed", COMPILER_ERROR: "compiler:error",
+  SYSTEM_LOG: "system:log", SYSTEM_HEALTH: "system:health",
+} as const;

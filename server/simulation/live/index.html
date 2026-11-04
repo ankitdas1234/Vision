@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Vision — Simulation</title>
+<link rel="icon" type="image/png" href="../assets/logo/Vision.png" />
+<link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+
+<!-- Shown only if this file is opened directly (file://). The page needs the Vision
+     server: it reads the virtual robot's state from /api/simulation/stream. -->
+<div class="proto-banner" id="protoBanner">
+  <div>
+    <strong>This page needs the Vision server.</strong>
+    <div>Start the server with <code>ROBOT_MODE=simulation</code>, log in on the dashboard, then open <code>http://localhost:4000/simulation/</code>.</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="stage-panel">
+    <div id="stage3d"></div>
+    <div class="model-loading" id="modelLoading">Loading 3D model…</div>
+
+    <!-- Connection / auth / mode problems land here, with what to do about them. -->
+    <div class="notice" id="notice"></div>
+
+    <div class="body-state" id="bodyState">Idle</div>
+
+    <!-- Live view of what the SERVER's virtual robot is doing (this page computes none of it). -->
+    <div class="hud" id="hud">
+      <div class="hud-title">Virtual robot <span class="hud-mode" id="hudMode">connecting…</span></div>
+      <div class="hud-row"><span>Head (CH0)</span><b id="hudHead">—</b></div>
+      <div class="hud-row"><span>Left leg (CH1)</span><b id="hudLeft">—</b></div>
+      <div class="hud-row"><span>Right leg (CH2)</span><b id="hudRight">—</b></div>
+      <div class="hud-row"><span>Heading</span><b id="hudHeading">—</b></div>
+      <div class="hud-row"><span>Ultrasonic</span><b id="hudUltra">—</b></div>
+      <div class="hud-row"><span>Last command</span><b id="hudCmd">—</b></div>
+    </div>
+
+    <!-- transient caption: what you said and what Vision replied, then fades. -->
+    <div class="caption" id="caption"></div>
+
+    <div class="support-warning" id="supportWarning">
+      Your browser doesn't support continuous speech recognition — try Chrome or Edge.
+      <button class="fallback-toggle" id="fallbackToggle">Type instead</button>
+    </div>
+
+    <div class="mic-dock">
+      <button class="mic-btn" id="micBtn" title="Toggle microphone">
+        <svg class="ico" id="micIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
+      </button>
+      <div class="mic-hint">Tap to talk · say “Vision, turn left”</div>
+    </div>
+
+    <form class="fallback-input" id="fallbackForm">
+      <input id="fallbackText" type="text" placeholder="Type to Vision…" autocomplete="off" />
+      <button type="submit" title="Send">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 21 3l-8.5 18-2.3-7.2L3 11.5Z" fill="currentColor"/></svg>
+      </button>
+    </form>
+    <button class="keyboard-toggle" id="keyboardToggle" title="Type instead">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Zm2 3v2h2V9H5Zm4 0v2h2V9H9Zm4 0v2h2V9h-2Zm4 0v2h2V9h-2ZM7 14v2h10v-2H7Z" fill="currentColor"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="../vendor/three.min.js"></script>
+<script type="module" src="./js/client.js"></script>
+</body>
+</html>

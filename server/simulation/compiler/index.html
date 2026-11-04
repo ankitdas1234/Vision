@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Vision's Simulation Engine</title>
+<link rel="icon" type="image/png" href="../assets/logo/Vision.png" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./css/compiler.css" />
+</head>
+<body>
+  <!-- hidden bindings for JS -->
+  <span id="srcName" style="display:none">—</span>
+  <span id="hbLed" style="display:none"></span>
+
+  <!-- Same layout as the compiler repo's simulator. The script is written and compiled on the
+       dashboard's Compiler page and arrives here already compiled (see js/link.js). -->
+  <div class="main">
+    <div class="viewport" id="stageEl">
+      <div id="stage3d"></div>
+      <div id="modelLoading"><span class="sp"></span> Loading model…</div>
+      <div class="flash" id="flash"></div>
+      <div class="bubble" id="bubble"></div>
+      <div class="stopchip" id="stopchip">EMERGENCY STOP</div>
+      <div class="vp-overlay">
+        <div class="vp-overlay-top">
+          <div class="chip">FPS <b id="fpsVal">—</b></div>
+          <div class="cam-tools">
+            <button class="cam-btn" id="btnCamReset" title="Reset camera"><i class="fa-solid fa-clock-rotate-left"></i></button>
+            <button class="cam-btn" id="btnCamFront" title="Front"><i class="fa-solid fa-cube"></i></button>
+            <button class="cam-btn" id="btnCamSide" title="Side"><i class="fa-solid fa-border-top-left"></i></button>
+            <button class="cam-btn" id="btnCamTop" title="Top"><i class="fa-solid fa-arrow-up"></i></button>
+          </div>
+        </div>
+        <div class="vp-overlay-bottom">
+          <div class="hint"><span class="k">Drag</span> orbit · <span class="k">Scroll</span> zoom · <span class="k">Space</span> play · <span class="k">→</span> step</div>
+          <div class="mode-tags">
+            <span class="mode-tag walk" id="badgeWalk">Walking</span>
+            <span class="mode-tag dance" id="badgeDance">Dancing</span>
+            <span class="mode-tag estop" id="badgeEstop">E-Stop</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="sidebar-scroll">
+      <div class="section playback-section">
+        <div class="section-title">
+          <span><i class="fa-solid fa-gamepad"></i> Playback</span>
+          <!-- <div class="status" id="statusPill">
+            <span class="dot" id="statusLed"></span>
+            <span id="statusText">Idle</span>
+          </div> -->
+        </div>
+        <div class="section-body">
+          <div class="controls">
+            <button class="btn btn-icon" id="btnReset" title="Reset (R)"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+            <button class="btn btn-primary" id="btnPlay" title="Play / Pause (Space)">
+              <i class="fa-solid fa-play ico-play"></i>
+              <i class="fa-solid fa-pause ico-pause" style="display:none"></i>
+              <span id="playLabel">Play</span>
+            </button>
+            <button class="btn" id="btnStep" title="Step (→)"><i class="fa-solid fa-forward-step"></i> Step</button>
+          </div>
+          <div class="speed">
+            <i class="fa-solid fa-gauge-high" style="font-size:11px;opacity:.7"></i>
+            <span>Speed</span>
+            <input type="range" id="speed" min="0.1" max="4" step="0.1" value="0.5" />
+            <span class="speed-val" id="speedVal">1×</span>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><i class="fa-solid fa-bars-staggered"></i> Timeline</div>
+        <div class="section-body">
+          <div class="timeline-row">
+            <span>Step <b id="stepCur">0</b> / <b id="stepTotal">0</b></span>
+            <span id="stepPct">0%</span>
+          </div>
+          <!-- Line graph timeline -->
+          <div class="graph-track">
+            <svg id="timelineGraph" class="graph-svg" viewBox="0 0 400 96" preserveAspectRatio="none" aria-label="Instruction activity line graph"></svg>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><i class="fa-solid fa-gauge"></i> Telemetry</div>
+        <div class="section-body">
+          <div class="telem" id="state"></div>
+        </div>
+      </div>
+      <div class="section log-section">
+        <div class="section-title"><i class="fa-solid fa-terminal"></i> Instruction stream</div>
+        <div class="section-body">
+          <div class="log-tools">
+            <span class="filter on" data-f="all">ALL</span>
+            <span class="filter" data-f="cmd">CMD</span>
+            <span class="filter" data-f="wait">WAIT</span>
+            <span class="filter" data-f="print">PRINT</span>
+            <span class="log-count" id="logCount">0 instr</span>
+          </div>
+          <div class="log" id="log"></div>
+        </div>
+      </div>
+      </div><!-- /.sidebar-scroll -->
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <span>IR <b>client-side</b></span>
+    <span class="sep"></span>
+    <span>Engine <b>Three.js r128</b></span>
+    <span class="sep"></span>
+    <span id="camInfo">Cam <b>—</b></span>
+    <span class="right">Last <b id="lastEventBar">—</b></span>
+  </footer>
+
+  <script src="../vendor/three.min.js"></script>
+  <script src="./js/sim.js"></script>
+  <script src="./js/link.js"></script>
+</body>
+</html>

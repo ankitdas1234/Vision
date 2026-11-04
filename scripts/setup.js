@@ -7,6 +7,7 @@ if (!fs.existsSync(".env")) {
   fs.copyFileSync(".env.example", ".env");
   console.log("Created .env from .env.example — fill in real values before production use.");
 }
+
 console.log("Installing server dependencies...");
 execSync("npm install", { cwd: "server", stdio: "inherit" });
 

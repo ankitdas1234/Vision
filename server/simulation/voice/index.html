@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Vision — Voice</title>
+<link rel="icon" type="image/png" href="../assets/logo/Vision.png" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+
+<div class="proto-banner" id="protoBanner"><div><strong>This page needs to be served, not opened directly.</strong><div>Open <code>http://localhost:4000/simulation/</code> through the Vision server.</div></div></div>
+
+
+<div class="main">
+  <div class="stage-panel">
+    <div id="stage3d"></div>
+    <div class="model-loading" id="modelLoading">Loading 3D model…</div>
+    <div class="body-state" id="bodyState">Idle</div>
+    <div class="badge" id="llmBadge" style="position:absolute;top:14px;right:14px;z-index:5">AI: checking…</div>
+
+    <!-- transient caption — shows what you said and what Vision replied,
+         then fades; this is the whole "conversation", by design there's no
+         persistent chat log, just the mic. -->
+    <div class="caption" id="caption"></div>
+
+    <div class="support-warning" id="supportWarning">
+      Your browser doesn't support continuous speech recognition — try Chrome or Edge.
+      <button class="fallback-toggle" id="fallbackToggle">Type instead</button>
+    </div>
+
+    <div class="mic-dock">
+      <button class="mic-btn" id="micBtn" title="Toggle microphone">
+        <i class="fa-solid fa-microphone-slash" id="micIcon"></i>
+      </button>
+      <div class="mic-hint">Tap to talk · try "Vision, dance" · "play &lt;song&gt;"</div>
+    </div>
+
+    <!-- Hidden unless speech recognition is unsupported, or the keyboard
+         icon is tapped — a small escape hatch, not a chat panel. -->
+    <form class="fallback-input" id="fallbackForm">
+      <input id="fallbackText" type="text" placeholder="Type to Vision…" autocomplete="off" />
+      <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
+    <div class="stage-actions">
+      <button class="action-btn keyboard-toggle" id="keyboardToggle" title="Type instead" aria-label="Type message">
+        <i class="fa-solid fa-keyboard"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="../vendor/three.min.js"></script>
+<script type="module" src="./js/client.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+# Normalize line endings for everyone, regardless of OS or local git
+# autocrlf settings — without this, a Windows checkout can silently
+# convert LF to CRLF, which breaks shebang lines (#!/usr/bin/env bash)
+# in scripts/*.sh and scripts/*.js when run under WSL/Git Bash, and
+# causes noisy whole-file diffs when contributors on different OSes
+# touch the same file.
+* text=auto eol=lf
+
+# Never touch line endings in binary-ish or generated files.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.zip binary
+*.woff binary
+*.woff2 binary
+
+# Windows batch files, if any ever get added, genuinely need CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf

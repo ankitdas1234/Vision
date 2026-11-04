@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vision · Consciousness Sandbox</title>
+<link rel="icon" type="image/png" href="../assets/logo/Vision.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+<div class="proto-banner" id="protoBanner"><div><strong>Serve this page, don't open the file.</strong><div>Start the Vision server with <code>ROBOT_MODE=simulation</code> and open <code>http://localhost:4000/simulation/#autonomous</code>.</div></div></div>
+
+<header class="top">
+  <div class="brand"><img src="../assets/logo/Vision.png" alt="" /><div><b>Vision</b><span>autonomous · simulation only</span></div></div>
+  <div class="seg" id="modeSeg" role="group" aria-label="Mind mode">
+    <button data-mode="off">Off</button>
+    <button data-mode="local" class="on">Local mind</button>
+    <button data-mode="ai">AI mind</button>
+  </div>
+  <label class="seg-toggle sw" id="faceModelLbl" title="Switch the face model. Different models make different fingerprints, so people taught with one may not be recognised by the other."><input type="checkbox" id="faceModelToggle" role="switch" aria-label="Face model" /> Face model <b id="faceModelName">face-api</b></label>
+  <div class="spacer"></div>
+    <button type="button" class="help-btn" id="helpBtn" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">?</button>
+  <div class="badge" id="llmBadge"><i></i><span>LLM: checking…</span></div>
+  <button class="estop" id="estop" title="Emergency stop (Esc)">E-STOP</button>
+</header>
+<script>/* inside the simulator shell the mind controls live in the shell's top bar: drop this header now, before the 3D view measures the page */try{if(window.parent!==window&&window.parent.document.getElementById("estop"))document.querySelector("header.top").remove();}catch(e){}</script>
+
+<div class="layout">
+  <!-- LEFT: the brain and the mind -->
+  <aside class="col">
+    <section class="card brain" id="brSec">
+      <div class="card-h"><h3>Brain</h3><span class="chip" id="brState">awake</span><button type="button" class="link-btn" id="brainExpand" title="Enlarge the brain and hormones">Enlarge</button></div>
+      <div class="brain-body">
+        <div class="brain-view"><canvas id="brainCanvas"></canvas></div>
+        <div class="brain-read">
+          <div class="emo-row"><i class="emo-dot"></i><span id="brEmo">neutral</span><em id="brInt">0%</em></div>
+          <i class="meter"><b id="brMeter"></b></i>
+          <p id="brWhy">at rest, waiting for something to happen</p>
+        </div>
+        <div class="brain-side">
+          <div class="chem-title">Hormones &amp; neuromodulators</div>
+          <div class="chem-grid" id="chemGrid"></div>
+          <div class="brain-instinct" id="brInstinct">instinct <b>observe</b></div>
+          <div class="brain-divisions" id="brDivisions" title="Relative neuron mass by major CNS division (matches real ~19/80/1 % ratio)">cerebrum · cerebellum · brainstem</div>
+          <div class="arch-panel" id="archPanel" title="Live predictive-processing architecture">
+            <div class="arch-title">Architecture · predictive loop</div>
+            <div class="arch-flow" id="archFlow">
+              <span class="arch-node" data-n="percept">Percept</span>
+              <span class="arch-arrow">→</span>
+              <span class="arch-node" data-n="model">Model</span>
+              <span class="arch-arrow">→</span>
+              <span class="arch-node" data-n="predict">Predict</span>
+              <span class="arch-arrow">→</span>
+              <span class="arch-node" data-n="pe">PE</span>
+              <span class="arch-arrow">→</span>
+              <span class="arch-node" data-n="need">Need</span>
+              <span class="arch-arrow">→</span>
+              <span class="arch-node" data-n="act">Act</span>
+              <span class="arch-arrow">→</span>
+              <span class="arch-node" data-n="decide">Decide</span>
+            </div>
+            <div class="arch-metrics">
+              <span>uncertainty <b id="archUnc">—</b></span>
+              <span>pred. error <b id="archPE">—</b></span>
+              <span>epistemic <b id="archEpi">—</b></span>
+            </div>
+          </div>
+          <ul class="brain-legend" id="brainLegend"></ul>
+          <p class="brain-note">A functional model, not a biological one. Drag the brain to turn it. <kbd>L</kbd> labels · <kbd>E</kbd> pathways · <kbd>Esc</kbd> closes. Generative model + prediction error drive curiosity.</p>
+        </div>
+      </div>
+    </section>
+    <section class="card mind">
+      <div class="card-h"><h3>Mind</h3><span class="chip ghost" id="mindLast"></span></div>
+      <div class="mind-mood" id="mindMood">calm</div>
+      <p class="mind-thought" id="mindThought"></p>
+      <p class="seeing" id="mindClock"></p>
+      <p class="seeing" id="mindPlan"></p>
+      <p class="facts" id="mindTraits" title="Personality traits drift slowly with experience"></p>
+      <p class="seeing" id="seeing">camera off</p>
+      <div class="bars" id="bars">
+        <label><span>curiosity</span><i><b data-k="curiosity"></b></i><em data-v="curiosity">0</em></label>
+        <label><span>social need</span><i><b data-k="social"></b></i><em data-v="social">0</em></label>
+        <label><span>boredom</span><i><b data-k="boredom"></b></i><em data-v="boredom">0</em></label>
+        <label><span>valence</span><i><b data-k="valence"></b></i><em data-v="valence">0</em></label>
+        <label><span>arousal</span><i><b data-k="arousal"></b></i><em data-v="arousal">0</em></label>
+      </div>
+      <p class="facts" id="facts"></p>
+    </section>
+  </aside>
+
+  <!-- CENTER: the arena -->
+  <section class="stage-panel">
+    <div class="ambient" aria-hidden="true"></div>
+    <div id="stage3d"></div>
+    <div class="model-loading" id="modelLoading">Loading 3D model…</div>
+    <div class="body-state" id="bodyState">Idle</div>
+    <canvas id="rain" class="rain"></canvas>
+    <div class="hud" id="hud" aria-label="time, weather and battery"></div>
+    <aside class="lab" id="lab" hidden aria-label="Lab">
+      <header class="lab-h"><div class="lab-title"><b>Lab</b><span>simulation only</span></div><div class="lab-tools"><button type="button" data-wide title="Wider / narrower" aria-label="Toggle width">⇔</button><button type="button" data-close title="Close (L)" aria-label="Close">×</button></div></header>
+      <nav class="lab-tabs" role="tablist"><button role="tab" data-tab="timeline">Timeline</button><button role="tab" data-tab="mind">Mind</button><button role="tab" data-tab="personality">Personality</button><button role="tab" data-tab="scenarios">Scenarios</button><button role="tab" data-tab="people">People</button><button role="tab" data-tab="story">Story</button><button role="tab" data-tab="map">Map</button><button role="tab" data-tab="ai">AI check</button></nav>
+      <div class="lab-body">
+        <div data-pane="timeline">
+          <div class="lab-bar"><div class="chips"><button type="button" class="chip2 btn" data-ser="mood"><i style="background:var(--cyan)"></i>mood</button><button type="button" class="chip2 btn" data-ser="energy"><i style="background:#fb923c"></i>energy</button><button type="button" class="chip2 btn" data-ser="battery"><i style="background:var(--good)"></i>battery</button></div>
+            <div class="chips"><button type="button" class="chip2 btn" data-span="120">2 min</button><button type="button" class="chip2 btn" data-span="600">10 min</button><button type="button" class="chip2 btn" data-span="0">all</button><button type="button" class="chip2 btn on" id="labLive" hidden>● live</button></div></div>
+          <canvas id="labChart" class="lab-cv" aria-label="Mood, energy and battery over time"></canvas><canvas id="labLane" class="lab-lane" aria-hidden="true"></canvas>
+          <div id="labDetail" class="lab-detail"></div>
+          <h4>Recent decisions</h4><ul id="labChanges" class="lab-list dec"></ul>
+          <p class="muted small">Hover or click the chart to inspect a moment. ▲ marks notable events. Coloured strip = what he was doing.</p>
+        </div>
+        <div data-pane="mind" hidden><div id="labMindBody"></div>
+          <section class="mind-learn"><h4>Learning log</h4>
+            <p class="muted small">Every choice he makes is logged (state, options, pick, reward). Export it, tune the weights offline with <code>server/scripts/tune-mind.ts</code>, then load the result here. No weights loaded = the original hand-tuned mind.</p>
+            <div class="lab-row"><button type="button" id="mlExport">Export log (.jsonl)</button><button type="button" id="mlLoad">Load weights…</button><button type="button" id="mlReset">Reset weights</button><button type="button" id="mlClear">Clear log</button><input type="file" id="mlFile" accept=".json,application/json" hidden></div>
+            <div class="lab-row"><label class="small" title="A tiny linear correction that keeps learning from outcomes while he runs. Bounded and small. Off = original behaviour."><input type="checkbox" id="mlResidual"> Online residual (step 3)</label><button type="button" id="mlResidualReset">Reset it</button>
+              <button type="button" id="mlNetLoad">Load net…</button><label class="small" title="A small net trained offline (server/scripts/train-net.ts). Adds to his scores. Off = original behaviour."><input type="checkbox" id="mlNetOn" disabled> Use net (step 4)</label><button type="button" id="mlNetClear">Remove net</button><input type="file" id="mlNetFile" accept=".json,application/json" hidden></div>
+            <p id="mlStatus" class="muted small" aria-live="polite"></p></section></div>
+        <div data-pane="personality" hidden><canvas id="labRadar" class="lab-cv radar" aria-label="Personality radar chart"></canvas><div id="labPresets" class="chips"></div><div id="labSliders" class="lab-sliders"></div><p class="muted small">Dashed outline = a neutral default. Changes apply immediately and shape how strongly things land.</p></div>
+        <div data-pane="scenarios" hidden><div id="labScList" class="sc-list"></div><div class="lab-row">Compare <select id="labA" aria-label="Personality A"></select> with <select id="labB" aria-label="Personality B"></select><button type="button" class="primary" id="labRun">Run</button><button type="button" id="labRunAll">Run all</button></div><div id="labResult"></div><p class="muted small">Runs on a fresh copy of him with a fake clock; your real Vision is untouched.</p></div>
+        <div data-pane="people" hidden>
+          <div class="lab-row"><button type="button" class="primary" id="labSnap">📸 Snap photo now</button><input id="labSnapName" placeholder="name (optional)" size="12" aria-label="Name for the photo"><span id="labSnapMsg" class="muted small"></span></div>
+          <div id="labPeople"></div>
+          <p class="muted small">With the camera on, Vision photographs every new face by himself (blurry frames are skipped) and files it under "Visitor N". Say "my name is …" and that profile gets your name. Kept in this browser only.</p></div>
+        <div data-pane="story" hidden><article id="labStory" class="story"></article><div class="lab-row"><button type="button" id="labStoryRefresh">Refresh</button><button type="button" id="labStoryCopy">Copy</button><button type="button" id="labStoryDl">Download .txt</button></div></div>
+        <div data-pane="ai" hidden>
+          <p>Is the AI mind answering, how fast, and is it really an AI model (not the local fallback)? Sends 3 short questions through the same route the Voice page uses.</p>
+          <div class="lab-row"><span id="labAiHealth"></span></div>
+          <div class="lab-row"><button type="button" class="primary" id="labAiRun">Test the AI mind</button></div>
+          <div id="labAiResult"></div>
+          <p class="muted small">He always decides locally. The AI only words what he says, so a slow or missing AI never stops him acting.</p>
+        </div>
+        <div data-pane="map" hidden><canvas id="labMap" class="lab-cv map" aria-label="Top-down map: click to mark a spot, drag objects to move them"></canvas><p class="muted small">Click to mark a spot <b id="labPick"></b> · drag an object to move it · white dot = Vision</p>
+          <div class="chips kinds"><button type="button" class="chip2 btn on" data-kind="box">box</button><button type="button" class="chip2 btn" data-kind="cylinder">cylinder</button><button type="button" class="chip2 btn" data-kind="sphere">sphere</button><button type="button" class="chip2 btn" data-kind="cone">cone</button><button type="button" class="chip2 btn" data-kind="charger">⚡ charger</button><button type="button" class="chip2 btn" data-kind="hot">hot zone</button><button type="button" class="chip2 btn" data-kind="cold">cold zone</button></div>
+          <div class="lab-row"><input id="labName" placeholder="name" size="9" aria-label="Name"><label class="sm">size <input id="labSize" value="2.5" size="3"></label><input id="labColor" type="color" value="#8b5cf6" aria-label="Colour"><button type="button" class="primary" id="labAddObj">Place at marked spot</button></div>
+          <ul id="labObjs" class="lab-list"></ul><div class="lab-row"><button type="button" id="labCopy">Copy as scenery.json</button><button type="button" id="labClear">Clear all</button><button type="button" id="labReset">Reset to scenery.json</button></div><p class="muted small">What you place here is saved in this browser and is still there after a reload.</p></div>
+      </div>
+    </aside>
+    <div class="caption" id="caption"></div>
+    <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+    <div class="pip" id="pip"><div class="pip-view"><video id="cam" playsinline muted></video><canvas id="pipOverlay"></canvas></div><div class="pip-bar"><span id="pipMotion"></span></div><div class="pip-status" id="pipStatus">camera off</div></div>
+    <div class="quick" id="quick" role="group" aria-label="Quick things to say"><button type="button" data-say="Hello!">Hello</button><button type="button" data-say="dance">Dance</button><button type="button" data-say="come here">Come here</button><button type="button" data-say="why did you do that?">Why did you do that?</button><button type="button" data-say="how much battery do you have?">Battery?</button><button type="button" data-say="what tricks do you know?">Tricks?</button><button type="button" data-say="did you dream last night?">Dreams?</button></div>
+    <form class="dock" id="talkForm">
+      <button type="button" class="mic-btn" id="micBtn" title="Talk (speech recognition)" aria-label="Talk with your voice"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      <input id="talkText" type="text" placeholder="Say something to Vision…  (press / to focus)" autocomplete="off" aria-label="Message" />
+      <button type="submit" class="send" id="sendBtn" disabled><span>Send</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <button type="button" class="lab-btn" id="labBtn" aria-controls="lab" title="Lab (press L)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9V3"/></svg><span>Lab</span></button>
+    </form>
+  </section>
+
+  <!-- RIGHT: capabilities, stimuli, log -->
+  <aside class="col">
+    <section class="card">
+      <div class="card-h"><h3>Capabilities</h3></div>
+      <div class="tgl-grid">
+        <label class="tgl"><input type="checkbox" id="tglCam" /><span>Camera</span><em id="camNote">off</em></label>
+        <label class="tgl" title="Draw what the face model sees on the camera preview: boxes, who it matched and why, fingerprints"><input type="checkbox" id="tglCamDbg" /><span>Camera debug</span><em id="camDbgNote">off</em></label>
+        <label class="tgl"><input type="checkbox" id="tglMic" /><span>Microphone</span><em id="micNote">off</em></label>
+        <label class="tgl"><input type="checkbox" id="tglVoice" checked /><span>Voice</span><em>speaks aloud</em></label>
+        <label class="tgl"><input type="checkbox" id="tglShare" /><span>Share frames</span><em>with the AI</em></label>
+        <label class="tgl" title="Day and night, plans, memory of people, hurt feelings, dreams"><input type="checkbox" id="humanToggle" checked /><span>Human-like</span><em>day, plans, memory</em></label>
+        <label class="tgl" title="Open the Voice page: wake-word commands, music, and AI answers"><input type="checkbox" id="tglVoicePage" /><span>Voice page</span><em>talk, music</em></label>
+        <label class="tgl" title="Open the Live link: talk to the server's virtual robot"><input type="checkbox" id="tglLive" /><span>Live link</span><em>server's robot</em></label>
+      </div>
+      <div class="speed-row"><span>Day length</span>
+        <select id="dayLen" aria-label="Length of a simulated day"><option value="24">24 min</option><option value="60">1 hour</option><option value="12">12 min</option><option value="6">6 min</option></select></div>
+      <div class="speed-row"><span>Time speed</span>
+        <div class="seg mini" id="speedSeg" role="group" aria-label="Time speed"><button data-speed="1" class="on">1×</button><button data-speed="5">5×</button><button data-speed="20">20×</button></div></div>
+    </section>
+    <section class="card">
+      <div class="card-h"><h3>Stimuli</h3></div>
+      <div class="stim">
+        <button type="button" data-stim="praise" class="good" title="Praise him: trust and mood go up"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 8.6a5 5 0 0 0-8.8-3.2 5 5 0 0 0-8.8 3.2c0 5.6 8.8 11 8.8 11s8.8-5.4 8.8-11z"/></svg><span>Praise</span></button><button type="button" data-stim="scold" class="bad" title="Scold him: he may sulk until you apologise"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 16s1.5-2 4-2 4 2 4 2M9 9.5h.01M15 9.5h.01"/></svg><span>Scold</span></button>
+        <button type="button" data-stim="poke" title="Poke him: too many and he asks for space"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5a1.5 1.5 0 0 1 3 0v5m0-1a1.5 1.5 0 0 1 3 0v2m0-1a1.5 1.5 0 0 1 3 0v4a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-3l-2-4a1.5 1.5 0 0 1 2.4-1.7L9 14"/></svg><span>Poke</span></button><button type="button" data-stim="ignored" title="Ignore him: he gets lonely"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 6.1A10 10 0 0 1 22 12a14 14 0 0 1-2.6 3.4M6.6 6.7A14 14 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 4.4-1"/></svg><span>Ignore him</span></button>
+        <button type="button" data-stim="loud_noise" class="bad" title="A loud noise from a random side: he turns toward it"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg><span>Loud noise</span></button><button type="button" data-stim="gift" class="good" title="Drop a new toy in the arena"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg><span>Drop a toy</span></button>
+        <button type="button" data-stim="teleport" title="Pick him up and put him somewhere far away"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Teleport far</span></button><button type="button" data-stim="skip" title="Fast-forward one simulated minute"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m13 6 6 6-6 6M5 6l6 6-6 6"/></svg><span>Skip 60 s</span></button>
+        <button type="button" data-stim="teach" class="wide" title="Face the camera and type your name so he learns your face"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M19 8v6M22 11h-6"/><circle cx="8.5" cy="7" r="4"/></svg><span>Teach my face (type your name)</span></button>
+        <button type="button" data-stim="forget" class="wide" title="He forgets everything about this person"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M17 8l5 5M22 8l-5 5"/><circle cx="8.5" cy="7" r="4"/></svg><span>Forget me (he forgets this person)</span></button>
+        <button type="button" data-stim="reset" class="danger wide bad" title="Wipe his memory completely"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/></svg><span>Reset memory</span></button>
+      </div>
+    </section>
+    <section class="card whycard">
+      <div class="card-h"><h3>Why he did that</h3></div>
+      <div class="why" id="why" aria-live="polite"></div>
+    </section>
+    <section class="card grow">
+      <div class="card-h"><h3>Event log</h3></div>
+      <div class="log" id="log"></div>
+    </section>
+  </aside>
+</div>
+
+<script src="../vendor/three.min.js"></script>
+<script src="../vendor/GLTFLoader.js"></script>
+<script type="module" src="./js/main.js"></script>
+<div class="keys" id="keys" hidden role="dialog" aria-label="Keyboard shortcuts"><div class="keys-card"><h3>Keyboard</h3><dl><dt><kbd>L</kbd></dt><dd>Open or close the Lab</dd><dt><kbd>/</kbd></dt><dd>Jump to the message box</dd><dt><kbd>?</kbd></dt><dd>This help</dd><dt><kbd>Esc</kbd></dt><dd>E-STOP: stop everything now</dd></dl><button type="button" id="keysClose">Close</button></div></div>
+</body>
+</html>
