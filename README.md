@@ -4,7 +4,7 @@
   </a>
 </p>
 <p align="center">
- <b>vision : </b>a robot with real human intelligence, consisting of memory and emotions like a real human.
+ a robot with real human intelligence, consisting of memory and emotions like a real human.
 </p>
 
 <p align="center">
@@ -13,7 +13,6 @@
   <a href="#database"><img alt="PostgreSQL" src="https://img.shields.io/badge/database-postgres%20%2B%20pgvector-4169E1?style=flat-square&logo=postgresql&logoColor=white" /></a>
   <a href="#hardware"><img alt="ESP32" src="https://img.shields.io/badge/firmware-esp32--s3-E7352C?style=flat-square&logo=espressif&logoColor=white" /></a>
   <a href="#the-simulator"><img alt="Three.js" src="https://img.shields.io/badge/simulator-three.js-000000?style=flat-square&logo=threedotjs&logoColor=white" /></a>
-  <img alt="Private" src="https://img.shields.io/badge/license-private-lightgrey?style=flat-square" />
 </p>
 
 

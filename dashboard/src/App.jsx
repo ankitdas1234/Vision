@@ -5,7 +5,6 @@ import RoleRoute from "./auth/RoleRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 
 import Home from "./pages/Home.jsx";
-import Docs from "./pages/Docs.jsx";
 import Blog from "./pages/Blog.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
@@ -50,7 +49,6 @@ export default function App() {
         <Routes>
           {/* Public */}
           <Route path="/" element={<Home />} />
-          <Route path="/docs" element={<Docs />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
