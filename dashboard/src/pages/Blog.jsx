@@ -311,7 +311,6 @@ const Chem = ({ c }) => (
   </div>
 );
 
-/* ───────────────────────── the blog ───────────────────────── */
 const Blog = () => {
   return (
     <div className="min-h-screen cool bg-white text-[#1a1a1a] selection:bg-yellow-600 selection:text-white px-6 pt-16 pb-24 font-sans antialiased">

@@ -14,47 +14,55 @@ const Home = () => {
   ];
 
   const faqs = [
-    {
-      q: "What is this platform?",
-      a: "It is a self-hosted deployment platform where you can deploy any GitHub repository with one click and get a live URL instantly.",
-    },
-    {
-      q: "What kind of projects can I deploy?",
-      a: "You can deploy any project with a build script — Vite, React, Next.js, plain HTML, or any Node.js project. We auto-detect your package manager and framework.",
-    },
-    {
-      q: "Do I need to configure anything?",
-      a: "No. Just paste your GitHub repo URL, select a branch, and click Deploy. We handle cloning, installing dependencies, building, and serving your project.",
-    },
-    {
-      q: "How long does a deployment take?",
-      a: "Most projects deploy in under 2 minutes. The time depends on the size of your project and how many dependencies it has.",
-    },
-    {
-      q: "What happens if my build fails?",
-      a: "The deployment status will show as failed. You can see the build logs to understand what went wrong, fix your code, and redeploy.",
-    },
-    {
-      q: "Can I deploy a plain HTML project?",
-      a: "Yes. If your repo has no package.json we detect it as a static site and serve it directly without any build step.",
-    },
-    {
-      q: "How do I see my past deployments?",
-      a: "Every project on your dashboard shows all past deployments with their status, date, and URL.",
-    },
-    {
-      q: "Is my data safe?",
-      a: "Yes. Your code is cloned temporarily for building and deleted immediately after. Only the final build output is stored.",
-    },
-    {
-      q: "Can I redeploy the same project?",
-      a: "Yes. Just go to your project and click Deploy again. Each deployment gets its own unique ID and URL.",
-    },
-    {
-      q: "What package managers are supported?",
-      a: "We support npm, yarn, and pnpm. We auto-detect which one your project uses based on the lock file.",
-    },
-  ];
+  {
+    q: "What is Vision?",
+    a: "It’s a small walking robot with a real, persistent brain. You can run it on actual hardware or just play with the full 3D simulator in your browser — no robot needed.",
+  },
+  {
+    q: "Do I need real hardware to try it?",
+    a: "Nope. It starts in simulation mode by default. You’ll get a complete 3D robot you can watch, teach, talk to, praise or scold, all from the browser.",
+  },
+  {
+    q: "What can the robot actually do?",
+    a: "It walks, turns its head, recognizes people and objects, remembers faces and facts, reacts with mood, follows voice commands, plays music, and you can even program it with a simple scripting language.",
+  },
+  {
+    q: "How does the brain work?",
+    a: "The server constantly watches, decides, and reacts. It has perception, layered memory, internal state (curiosity, annoyance, etc.), decision-making, and a reaction system. Safety always comes first — nothing overrides it.",
+  },
+  {
+    q: "Do I need an AI API key?",
+    a: "No. Without a key it just uses its built-in local mind and memory. An optional OpenRouter key only helps when local memory doesn’t have an answer.",
+  },
+  {
+    q: "How does memory work?",
+    a: "It checks memory in layers: fixed facts first, then things it has learned, then conceptual similarity, and only then (optionally) AI. Anything useful it learns can be saved permanently.",
+  },
+  {
+    q: "Can I teach it my face or new facts?",
+    a: "Yes. You can teach it your face right from the dashboard, and admins can add facts in Memory Lookup. Restart the server and everything is still there.",
+  },
+  {
+    q: "What is the Autonomous mind?",
+    a: "That’s the mode where the robot decides for itself. It has its own emotional model. Praise or scold it and you’ll see its mood and behaviour change.",
+  },
+  {
+    q: "Is the real robot safe?",
+    a: "Yes. It has multiple safety layers: ultrasonic obstacle detection, it won’t walk unless the head is facing forward, watchdog timeouts, command checks, and a hardware emergency stop that nothing can override.",
+  },
+  {
+    q: "What hardware does the physical robot use?",
+    a: "An ESP32-S3 with a camera, three servos (one for the head, two for the legs), an ultrasonic sensor, a microphone and a speaker. The ESP32 only senses and moves — all the thinking happens on the server.",
+  },
+  {
+    q: "Can I program the robot myself?",
+    a: "Yes. Admins can write Vision Script on the Compiler page. It gets compiled, safety-checked, and then runs like any other command.",
+  },
+  {
+    q: "How do I switch between simulation and the real robot?",
+    a: "Just pick Simulation or Real robot on the Robot page in the dashboard. The server also respects the ROBOT_MODE setting as a starting point. Simulator endpoints are blocked when you’re in hardware mode.",
+  },
+];
 
   return (
     <>
