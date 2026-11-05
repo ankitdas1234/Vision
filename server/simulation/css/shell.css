@@ -79,30 +79,31 @@ body {
 .bar { height: 56px; gap: 12px; padding: 0 18px; background: linear-gradient(180deg, #111114, #0b0b0d); white-space: nowrap; }
 .bar > * { flex-shrink: 0; }
 .bar .spacer { flex: 1 1 0; min-width: 8px; flex-shrink: 1; }
-.mode { height: 36px; margin-left: 10px; padding: 0 14px; gap: 10px; }
+.mode { height: 34px; margin-left: 10px; padding: 0 14px; gap: 10px; }
 .vsep { width: 1px; height: 24px; background: var(--border); margin: 0 2px; }
 
 .mind { display: none; align-items: center; gap: 10px; }
 .bar.mind-on .mind { display: flex; }
 
-/* Off / Local mind / AI mind: three equal buttons with a highlight that slides under the chosen one */
-.seg { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; height: 36px; padding: 3px; background: #0e0e11; border: 1px solid var(--border-2); border-radius: 11px;
-  --i: 0; --thumb: linear-gradient(135deg, #b79cff, #8b6df5); --thumb-fg: #100c1c; --thumb-glow: rgba(139,109,245,.38); }
-.seg::before { content: ""; position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 3); border-radius: 8px; background: var(--thumb);
-  box-shadow: 0 2px 12px var(--thumb-glow), inset 0 0 0 1px rgba(255,255,255,.2); transform: translateX(calc(var(--i) * 100%));
+/* Off / Local mind / AI mind: a compact chip like the Face model one, with a soft highlight that slides under the chosen option */
+.seg { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; height: 30px; padding: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  --i: 0; --thumb: rgba(167,139,250,.14); --thumb-ring: rgba(167,139,250,.5); --thumb-fg: #e6deff; }
+.seg:hover { border-color: var(--border-2); }
+.seg::before { content: ""; position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc((100% - 4px) / 3); border-radius: 8px; background: var(--thumb);
+  box-shadow: inset 0 0 0 1px var(--thumb-ring); transform: translateX(calc(var(--i) * 100%));
   transition: transform .28s cubic-bezier(.3,1.25,.5,1), background .2s, box-shadow .2s; }
 .seg:has(button:nth-child(2).on) { --i: 1; }
 .seg:has(button:nth-child(3).on) { --i: 2; }
-.seg:has(button:nth-child(1).on) { --i: 0; --thumb: linear-gradient(135deg, #5b5b66, #43434c); --thumb-fg: #f4f4f5; --thumb-glow: rgba(0,0,0,.45); } /* Off: neutral grey, not purple */
-.seg button { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 28px; min-width: 100px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: #b4b4be; font: 500 12.5px var(--font); cursor: pointer; transition: color .18s, transform .08s; }
-.seg button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.seg:has(button:nth-child(1).on) { --i: 0; --thumb: rgba(255,255,255,.07); --thumb-ring: rgba(255,255,255,.16); --thumb-fg: #f4f4f5; } /* Off: neutral grey, not purple */
+.seg button { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 24px; min-width: 0; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 12px var(--font); white-space: nowrap; cursor: pointer; transition: color .18s, transform .08s; }
+.seg button svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .seg button:hover { color: #fff; }
 .seg button.on { color: var(--thumb-fg); font-weight: 600; }
 .seg button:active { transform: scale(.97); }
-.seg button:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.seg button:focus-visible { outline: 2px solid var(--purple); outline-offset: -2px; }
 
 /* Face model */
-.fm { display: inline-flex; align-items: center; gap: 9px; height: 36px; padding: 0 10px 0 11px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); font: 500 12.5px var(--font); color: var(--text-2); cursor: pointer; user-select: none; transition: border-color .15s, background .15s; }
+.fm { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px 0 11px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); font: 500 12px var(--font); color: var(--text-2); cursor: pointer; user-select: none; transition: border-color .15s, background .15s; }
 .fm:hover { border-color: var(--border-2); }
 .fm:has(input:checked) { border-color: rgba(167,139,250,.45); background: rgba(167,139,250,.07); }
 .fm > svg { width: 16px; height: 16px; fill: none; stroke: var(--text-3); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
@@ -115,17 +116,17 @@ body {
 .fm input:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
 
 /* LLM status, help, E-STOP */
-.badge { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; font: 11px var(--mono); color: var(--text-2); border: 1px solid var(--border); border-radius: 11px; background: var(--surface); white-space: nowrap; }
+.badge { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 14px; font: 11px var(--mono); color: var(--text-2); border: 1px solid var(--border); border-radius: 11px; background: var(--surface); white-space: nowrap; }
 .badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
 .badge.warn i { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
 .badge.good i { background: var(--good); box-shadow: 0 0 8px var(--good); }
-.help-btn { width: 36px; height: 36px; border-radius: 11px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); font: 600 13px var(--font); cursor: pointer; transition: border-color .15s, color .15s, transform .08s; }
+.help-btn { width: 30px; height: 30px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); font: 600 13px var(--font); cursor: pointer; transition: border-color .15s, color .15s, transform .08s; }
 .help-btn:hover { border-color: var(--border-2); color: var(--text); }
 .help-btn:active { transform: scale(.94); }
 .help-btn:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
 
 /* "Voice ×" / "Live link ×" chip while one of those views is open */
-.ov-chip { display: inline-flex; align-items: center; gap: 9px; height: 34px; padding: 0 11px 0 14px; border-radius: 999px; border: 1px solid rgba(167,139,250,.45); background: rgba(167,139,250,.12); color: #ddd3ff; font: 600 12.5px var(--font); cursor: pointer; transition: background .15s, border-color .15s; }
+.ov-chip { display: inline-flex; align-items: center; gap: 9px; height: 30px; padding: 0 11px 0 14px; border-radius: 999px; border: 1px solid rgba(167,139,250,.45); background: rgba(167,139,250,.12); color: #ddd3ff; font: 600 12.5px var(--font); cursor: pointer; transition: background .15s, border-color .15s; }
 .ov-chip[hidden] { display: none; }
 .ov-chip:hover { background: rgba(167,139,250,.2); border-color: rgba(167,139,250,.7); }
 .ov-chip svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
@@ -139,11 +140,23 @@ body {
 @media (max-width: 1420px) { .bar.mind-on .brand div { display: none; } .bar.mind-on .mode { margin-left: 4px; } }
 @media (max-width: 1300px) { .bar.mind-on .fm b, .bar.mind-on .badge { display: none; } }
 
-/* E-STOP: quiet outlined button that matches the other controls (was a solid red block). */
-.estop { display: inline-flex; align-items: center; gap: 9px; height: 36px; padding: 0 15px; border-radius: 11px; border: 1px solid rgba(239,68,68,.42); background: rgba(239,68,68,.09); color: #f87171; font: 600 12px var(--font); letter-spacing: .07em; cursor: pointer; box-shadow: none; filter: none; transition: background .15s, border-color .15s, color .15s, transform .08s; }
-.estop::before { content: ""; width: 9px; height: 9px; border-radius: 2.5px; background: currentColor; box-shadow: none; }
+/* E-STOP: one small square button, no text (the stop symbol only). Esc is still the emergency stop; the label stays for screen readers and as a tooltip. */
+.estop { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 0; border-radius: 10px; border: 1px solid rgba(239,68,68,.5); background: rgba(239,68,68,.12); color: #f87171; font-size: 0; line-height: 0; cursor: pointer; box-shadow: none; filter: none; transition: background .15s, border-color .15s, color .15s, transform .08s; }
+.estop::before { content: ""; width: 11px; height: 11px; border-radius: 3px; background: currentColor; box-shadow: none; }
 .estop:hover { background: rgba(239,68,68,.17); border-color: rgba(239,68,68,.72); color: #fca5a5; filter: none; }
 .estop:active { transform: scale(.97); }
 .estop:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
 .estop.armed { background: rgba(234,179,8,.1); border-color: rgba(234,179,8,.55); color: var(--warn); box-shadow: none; }
-.estop.armed::before { width: 10px; height: 10px; border-radius: 0; clip-path: polygon(15% 0,100% 50%,15% 100%); }
+.estop.armed::before { width: 13px; height: 13px; border-radius: 0; clip-path: polygon(15% 0,100% 50%,15% 100%); }
+
+/* Narrow windows: icons only for the mind chip and face model, and let the bar wrap to a second line instead of pushing E-STOP off screen. */
+@media (max-width: 1000px) {
+  .bar.mind-on .seg button { padding: 0 10px; font-size: 0; gap: 0; }
+  .bar.mind-on .seg button svg { width: 16px; height: 16px; }
+  .bar.mind-on .fm > span { display: none; }
+}
+@media (max-width: 860px) {
+  .bar { height: auto; min-height: 56px; flex-wrap: wrap; row-gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+  .bar .spacer { flex: 1 1 8px; }
+  .bar.mind-on .vsep { display: none; }
+}

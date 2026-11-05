@@ -8,6 +8,7 @@ import { controlMode, ControlModeError } from "../control/ControlMode";
 import { restrictionService, RestrictionError } from "../restrictions/RestrictionService";
 import { MANUAL_GATED_COMMANDS, MOVEMENT_COMMANDS, PHYSICALLY_DELIVERABLE_COMMANDS } from "../packages/commands";
 import type { CommandType, CommandResult, CommandSource } from "../packages/types";
+import { randomUUID } from "node:crypto";
 
 export interface DispatchInput {
   type: CommandType;
@@ -46,7 +47,7 @@ export class CommandRegistry {
   }
 
   async dispatch(input: DispatchInput): Promise<CommandResult> {
-    const commandId = crypto.randomUUID();
+    const commandId = randomUUID();
     const startedAt = new Date().toISOString();
 
     // A real person actively operating the dashboard counts as human interaction —

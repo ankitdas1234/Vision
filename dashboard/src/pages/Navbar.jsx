@@ -9,7 +9,7 @@ export function Navbar() {
             <a href="#Features" className="flex items-center gap-1 hover:text-white transition-opacity opacity-80 hover:opacity-100">Features</a>
             <a href="#Pricing" className="opacity-80 hover:opacity-100 transition-opacity">Pricing</a>
             <a href="/blog" className="opacity-80 hover:opacity-100 transition-opacity">Blog</a>
-            <a href="/docs" className="opacity-80 hover:opacity-100 transition-opacity">Docs</a>
+            {/* <a href="/docs" className="opacity-80 hover:opacity-100 transition-opacity">Docs</a> */}
           </div>
           <div className="flex items-center">
             <a href="/login" className="text-[14px] cursor-pointer font-medium px-4 opacity-80 hover:opacity-100 transition-opacity">Login</a>

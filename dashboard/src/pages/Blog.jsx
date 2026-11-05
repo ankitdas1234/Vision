@@ -311,6 +311,7 @@ const Chem = ({ c }) => (
   </div>
 );
 
+/* ───────────────────────── the blog ───────────────────────── */
 const Blog = () => {
   return (
     <div className="min-h-screen cool bg-white text-[#1a1a1a] selection:bg-yellow-600 selection:text-white px-6 pt-16 pb-24 font-sans antialiased">
@@ -1008,6 +1009,915 @@ chaotic stranger:   surprise 0.3, predictability 0.2,  trust 0.2  → 0.12 + 0.0
               his state, his pose, the last 8 lines of the conversation, the last 5 lessons and the 6 latest
               journal entries. it still cannot choose the action.</p>
 
+            <H3>how an event reaches the emotional brain</H3>
+            <p>
+              the emotional brain never receives "praise" or "scold" as a label. every event is turned into a
+              small bundle of numbers called an appraisal: how rewarding, how threatening, how much loss, anger,
+              novelty, social meaning, face, pain, plus a strength (0 to 1) and a duration in seconds. the regions
+              then react to those numbers, and the emotion is read out afterwards. this is the table that turns
+              things that happen into numbers, straight from the code:
+            </p>
+            <Rows
+              rows={[
+                ["praise", "reward 0.8, social 0.9, novelty 0.25. strength 0.7, lasts 5 s, counts as language."],
+                ["scold", "threat 0.3, loss 0.5, anger 0.15, social 0.85, novelty 0.3. strength 0.8, 3 s."],
+                ["loud noise", "threat 0.75, novelty 0.85 (fades with repetition). strength 0.95, only 1.2 s. sharp and short."],
+                ["poke", "novelty 0.55, threat 0.12, social 0.5, pain 0.1. strength 0.6, 1 s."],
+                ["a gift or new toy", "reward 0.85, novelty 0.7. strength 0.8, 3 s."],
+                ["sudden movement", "novelty 0.55, threat 0.15. strength 0.55, 1.5 s."],
+                ["lights go out", "threat 0.2, novelty 0.5. strength 0.5, 2 s."],
+                ["lights come on", "novelty 0.45, reward 0.1. strength 0.5, 2 s."],
+                ["being ignored", "loss 0.55. strength 0.5, 4 s."],
+                ["picked up and moved", "threat 0.45, novelty 0.9. strength 0.9, 2 s. one of only two things that can wake him fully."],
+                ["someone arrives", "social 0.8, face 0.8, reward 0.55, novelty 0.6. strength 0.75, 4 s."],
+                ["someone leaves", "loss 0.3, social 0.3. strength 0.4, 3 s."],
+                ["playing, dancing, finding somewhere new", "reward 0.65 (play), 0.55 (dance), or novelty 0.7 and reward 0.4 (discovery). strength 0.5 to 0.6."],
+                ["saying no, helping", "refusing gives a little loss 0.15 and anger 0.1. helping gives reward 0.25 and social 0.4. both weak, 0.3."],
+                ["a need that grew strong", "loneliness is loss 0.4, boredom loss 0.18, wondering novelty 0.45, company social 0.6 and reward 0.3. these are called by the mind itself, at most every 6 s."],
+              ]}
+            />
+            <p>
+              things he is shown or sees depend on what they are. a toy-like animal (cat, dog, bird, teddy bear,
+              horse, sheep, cow) is a reward of 0.8, food (pizza, cake, apple, banana, donut, sandwich, orange, cookie,
+              hot dog, broccoli, carrot) is 0.6, anything he is just shown and does not know is 0.35, and a plain
+              sighting only 0.1. a knife, scissors or fork is a threat of 0.55. being shown something is stronger than
+              merely seeing it (novelty 0.8 against 0.35, strength 0.7 against 0.4).
+            </p>
+            <p>
+              the part i like is familiarity. the same event again is less novel, so he gets used to things:
+            </p>
+            <Eq>{`novelty = base · max(0.3, 1 − 0.18·(n − 1))        familiarity = min(0.8, 0.2·(n − 1))
+(n is how many times this exact event has happened)
+
+a loud noise, base novelty 0.85:
+  1st: 0.85    2nd: 0.70    3rd: 0.54    4th: 0.39    5th and later: 0.26`}</Eq>
+            <p>
+              so the first loud noise makes him jump and the fifth barely does, which is the same habituation you
+              see in people and animals. the learned weights between regions are saved every 25 seconds of simulated
+              time, and the chemicals above their resting level by more than 0.1 are shown (the top three,
+              strongest first, with what each one does).
+            </p>
+
+            <H3>how he reads words: the affect lexicon</H3>
+            <p>
+              when you say something, it has to become an appraisal too. with no language model, this is done by a
+              hand written dictionary of English words in nine groups: reward, threat, loss, anger, disgust, pain,
+              social, novelty and face. a few hundred words in all, such as "love, cake, puppy" for reward, "snake,
+              fire, scared" for threat, and "idiot, hate, liar" for anger. a star on a word marks it as strong. a
+              plain word counts 0.65 and a strong one counts 1.0. then a handful of rules make it more like reading
+              and less like counting:
+            </p>
+            <Rows
+              rows={[
+                ["whole phrases first", "phrases like 'i love you' (reward 1, social 0.8), 'good job', 'shut up' (anger 1), 'go away', 'i hate you', 'watch out' (threat 0.9) and 'all alone' (loss 0.8) are found and removed before single words are looked at, so they are not counted twice."],
+                ["word endings", "if a word is not found he tries it without -ing, -ed, -es, -s or -ly, so 'laughing' and 'laughs' both find 'laugh'."],
+                ["negation", "the 3 words before a word are checked for not, no, never, don't, can't, without, nobody and so on. a negated good word becomes half as much loss ('not happy'). a negated bad word becomes a third as much reward ('not scary'). anything else negated is reduced to 15 percent."],
+                ["intensity words", "'very, so, really, extremely, totally...' multiply by 1.4. 'slightly, a bit, kinda, barely' multiply by 0.6."],
+                ["shouting", "a word in capital letters (3 or more) gets ×1.25."],
+                ["exclamation marks", "each one adds 10 percent, up to 3."],
+              ]}
+            />
+            <Eq>{`channel = (1 − exp(−1.5 · sum)) · (1 + 0.1·exclamation marks)     (a soft ceiling at 1)
+valence = reward − max(threat, 0.9·disgust, loss, 0.9·anger, 0.9·pain) + 0.1·social (if reward > 0)
+arousal = max(threat, anger, 0.8·reward, 0.7·novelty, pain, 0.6·disgust, 0.35·loss)
+strength of the whole sentence = 0.35 + 0.65 · (the strongest channel)`}</Eq>
+            <p>and three sentences worked through:</p>
+            <Rows
+              rows={[
+                ["'you are very stupid'", "'stupid' is a strong anger word, 'very' makes it 1 × 1.4 = 1.4 → anger = 1 − exp(−2.1) = 0.88. 'you' adds a little social (0.495) and anger lifts social by 0.35 × 0.88, so social = 0.80. valence = 0 − 0.9 × 0.88 = −0.79, arousal = 0.88, strength 0.92. a sharp hit."],
+                ["'i love you!'", "the phrase gives reward 1 and social 0.8, one exclamation mark makes it ×1.1 → reward 0.855, social 0.92. valence = 0.855 + 0.1 × 0.92 = +0.95, arousal 0.68 (0.8 × reward). strength 0.91. warm, but calm and not startled."],
+                ["'i am not happy'", "'happy' is a plain reward word (0.65), negated → loss 0.65 × 0.5 = 0.325 → loss = 0.39. valence −0.39, arousal 0.14, strength 0.60. a quiet, sad feeling, not an attack. the terminal shows he matched 'not happy'."],
+              ]}
+            />
+            <p>
+              it is a lexicon and a few rules, not understanding. sarcasm will fool it. it is what makes him react
+              sensibly when no model is configured, and with one, the model only words the reply, so the feeling
+              underneath is still this.
+            </p>
+          {/* ───── the brain, maths in depth ───── */}
+          <div className="space-y-6">
+            <H3>maths 0a. start here: how to read the formulas (no maths background needed)</H3>
+            <p>
+              if you have never liked maths, this is the part for you. every formula in this blog is built from a
+              very small toolbox, about a dozen symbols, and none of them is hard once you have seen it used on real
+              numbers once. read this section first and then the later ones will feel like sentences. everything
+              below uses the same kind of numbers the brain uses: small decimals between 0 and 1.
+            </p>
+            <Rows
+              rows={[
+                ["·  (a dot)", "just means times. 0.8 · 0.5 = 0.4. i use a dot instead of a star so it is not confused with the letter x."],
+                ["/  (a slash)", "divide. 6 / 3 = 2, and 1 / 4 = 0.25."],
+                ["+  and −", "add and take away. a minus in front of a whole bracket, like −(a + b), takes away both."],
+                ["=", "'is'. the left side is a name, the right side says how to calculate it."],
+                ["+=", "'add to itself'. activity += 0.1 means: take the current activity, add 0.1 and store it back. it is how a number changes over time in a program."],
+                ["( ) brackets", "do the inside first. 2 · (3 + 4) = 14, not 10."],
+                ["Σ  (sigma, a big E)", "'add up all of them'. Σ w · a means: for every connection, multiply its weight by the activity of the region it comes from, and add all those results together. if there are three connections with w · a of 0.3, 0.1 and 0.2, then the Σ is 0.6."],
+                ["x²  and  sqrt(x)", "squared is a number times itself: 0.5² = 0.25. sqrt is the opposite, the number that gives x when multiplied by itself: sqrt(0.25) = 0.5, sqrt(4) = 2, sqrt(16) = 4."],
+                ["|x|  (bars)", "the size of a number, ignoring the sign. |−0.4| = 0.4. it answers 'how far apart' without caring which is bigger."],
+                ["max(a, b)  and  min(a, b)", "the bigger or the smaller of the two. max(0, −0.3) = 0: it is a way to say 'only count this if it is positive'. min(1, 1.7) = 1: it is a way to say 'never go above 1'."],
+                ["clamp(x, lo, hi)", "keep a number inside a box: if it is below lo it becomes lo, if above hi it becomes hi. clamp(1.4, 0, 1) = 1. clamp(−0.2, 0, 1) = 0. most things in the brain are clamped to 0..1, like a volume knob that stops at the ends."],
+                ["mean (average)", "add them all up and divide by how many. the mean of 0.2, 0.4 and 0.6 is 1.2 / 3 = 0.4."],
+                ["e  and  e^x", "e is a special number, 2.718. e^x means e multiplied by itself x times, and it also works for fractions and negatives. you do not need to calculate it, only to know its shape: it is 1 when x is 0, it gets very big when x is positive, and it shrinks toward 0 when x is negative. a few values are in the next table."],
+                ["ln(x)", "the opposite of e^x. if e^2 = 7.39 then ln(7.39) = 2. it is used once, to work backwards from a resting level to the bias."],
+                ["argmax", "'which one is the biggest', the name not the value. if the scores are happy 0.2, sad 0.5, fearful 0.3, the argmax is sad."],
+                ["gauss", "a random number that is usually close to 0 and rarely far away (a bell curve). about two thirds of the time it is between −1 and +1. it is where the 'noise' comes from."],
+                ["→  (an arrow)", "'goes to'. AMY → HYP 0.7 means the amygdala pushes the hypothalamus with a strength of 0.7."],
+                ["a subscript like a_from", "a little word under the letter, saying which one. a_from is 'the activity of the region the connection starts at'."],
+                ["dt", "a tiny slice of time, here 0.02 seconds. 'per step' for the program."],
+                ["tau  (the Greek letter, written 'tau' here)", "a time constant: how slow something is, in seconds. small tau is fast, big tau is slow. maths 0b explains exactly what it means."],
+              ]}
+            />
+            <p>the only one that surprises people is e^x, so here are its values for the numbers this blog uses:</p>
+            <Eq>{`e^0     = 1.000
+e^−0.5  = 0.607
+e^−1    = 0.368        (one 'tau' of time has passed)
+e^−2    = 0.135        (two taus)
+e^−3    = 0.050        (three taus)
+e^−5    = 0.007
+e^1     = 2.718
+e^2     = 7.389
+e^3     = 20.09
+
+so  1 − e^−1 = 0.632,   1 − e^−2 = 0.865,   1 − e^−3 = 0.950,   1 − e^−5 = 0.993`}</Eq>
+            <p>
+              the important part is the last line. it is the 'how much of the way have we got' numbers, and it is the
+              heart of the whole model. we use it in the next section.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 0b. the six ideas the whole brain is built from</H3>
+            <p>
+              every equation in the brain is one of six ideas, used over and over on different regions and chemicals.
+              here they are one at a time, each with a small everyday picture and then exact numbers you can check
+              with a calculator.
+            </p>
+
+            <p><b>idea 1. a region is a dial between 0 and 1.</b></p>
+            <p>
+              think of each region as a dimmer switch on a lamp. 0 is dark, 1 is full brightness. but a lamp in a
+              brain is never fully dark, it rests at a small glow (0.03 or 0.05), which we call its rest. the number
+              that matters is not the dial itself but how far it is above its rest, because that is the 'extra'
+              that the rest of the brain can hear. that gap is called the lift: lift = activity − rest. if the amygdala
+              rests at 0.04 and is now at 0.54 then its lift is 0.50. when the blog says ex(region) it means the lift
+              rescaled to run 0 to 1: ex = (activity − rest) / (1 − rest). for the amygdala at 0.54 that is
+              0.50 / 0.96 = 0.52. a region at rest has ex = 0, a region at full has ex = 1. every emotion formula
+              uses ex.
+            </p>
+
+            <p><b>idea 2. chasing a target (the leaky bucket, and the meaning of tau).</b></p>
+            <p>
+              nothing in the brain jumps. a region always moves toward where it wants to be, a little at a time,
+              like you walk towards a door: big steps when far, tiny steps when close. in the code it is one line:
+            </p>
+            <Eq>{`new = old + (target − old) · k          k is the fraction of the gap you close in one step`}</Eq>
+            <p>take the target as 1 and start at 0, with k = 0.2 (close a fifth of the remaining gap each step):</p>
+            <Eq>{`step 1:   0 + (1 − 0)     · 0.2 = 0.200
+step 2:   0.2 + (1 − 0.2)    · 0.2 = 0.360
+step 3:   0.36 + (1 − 0.36)   · 0.2 = 0.488
+step 4:   0.488 + (1 − 0.488) · 0.2 = 0.590
+step 5:   0.672        step 6:  0.738        step 7:  0.790
+step 8:   0.832        step 9:  0.866        step 10: 0.893`}</Eq>
+            <p>
+              notice it moves fast at first (0.2 in the first step) and slowly at the end (0.027 in the tenth). that
+              is exactly how a real feeling rises: a rush, then it settles. now, how big should k be? that is what tau
+              decides. k = 1 − e^(−dt / tau). you have the e values above, so let us use them. a step of dt = 0.02 s:
+            </p>
+            <Rows
+              rows={[
+                ["fast region, tau 0.05 (amygdala)", "k = 1 − e^(−0.02 / 0.05) = 1 − e^−0.4 = 1 − 0.670 = 0.330. it closes a third of the gap every 20 ms and gets 95 percent of the way (3 taus) in 0.15 seconds. a flash."],
+                ["medium, tau 0.08 (accumbens)", "k = 1 − e^−0.25 = 1 − 0.779 = 0.221. 95 percent after 0.24 s."],
+                ["slow, tau 0.2 (sadness, raphe, PCC)", "k = 1 − e^−0.1 = 1 − 0.905 = 0.095. less than a tenth of the gap per step, 95 percent after 0.6 s. a slow swell."],
+                ["very slow, tau 18 s (cortisol)", "95 percent after 54 seconds, which is why stress takes about a minute to build and several minutes to fade."],
+              ]}
+            />
+            <p>
+              so tau is simply 'the time it takes to get about two thirds (63 percent) of the way there'. after two taus
+              you are 86 percent of the way, after three 95 percent. that is all it is. every region has its own tau and
+              every chemical has its own, and that is what gives each part of the brain its own speed.
+            </p>
+            <p>
+              why is the formula 1 − e^(−dt / tau) and not the simpler dt / tau? because the simple one breaks when
+              you change the step size. with dt = 0.02 and tau 0.08 the simple one gives 0.25, and with two steps of
+              0.01 each it would give 1 − (1 − 0.125)² = 0.234. a different answer for the same 20 ms, which means the
+              brain would behave differently on a slow computer. the e version gives 0.2212 either way:
+              each half step is k = 1 − e^−0.125 = 0.1175, and 1 − (1 − 0.1175)² = 0.2212. the same. that is why the
+              brain feels the same on every computer.
+            </p>
+
+            <p><b>idea 3. adding up pushes (a vote with weights).</b></p>
+            <p>
+              a region listens to the regions that connect to it and adds up what they say, each one multiplied by
+              how much it is trusted (the weight). imagine the accumbens being pushed by three regions. say the VTA
+              is 0.49 above rest, the value area 0.3 and the orbitofrontal 0.2, and the weights are 0.9, 0.5 and 0.5:
+            </p>
+            <Eq>{`0.49 · 0.9  +  0.30 · 0.5  +  0.20 · 0.5  =  0.441 + 0.150 + 0.100  =  0.691
+then times the synapse factor 0.6:   0.691 · 0.6 = 0.415    (this is the 'synapses' part of x)`}</Eq>
+            <p>
+              the VTA counts for the most (0.441) because it is both very active and very trusted. a region that is
+              resting sends nothing, since its lift is 0. and a negative weight does the opposite: it subtracts. a
+              value area at 0.5 above rest with a weight of −0.5 onto the amygdala takes 0.25 away from it, which is
+              the calming brake.
+            </p>
+
+            <p><b>idea 4. squashing with the sigmoid (a door that is hard to open at first and then flies open).</b></p>
+            <p>
+              the total push x can be any number, and the region has to turn it into a dial setting from 0 to 1. the
+              sigmoid does that. picture a heavy door. a weak push barely moves it, a push in the middle swings it
+              quickly, and a huge push cannot open it more than fully. the formula is
+              sigma(x) = 1 / (1 + e^(−6 · (x − 0.55))). do it by hand for x = 0.206, the number from the accumbens
+              example:
+            </p>
+            <Eq>{`step 1:  x − 0.55        = 0.206 − 0.55   = −0.344
+step 2:  times 6         = −0.344 · 6     = −2.064
+step 3:  e to minus that = e^(+2.064)     = 7.88      (minus a minus is a plus)
+step 4:  1 + that        = 8.88
+step 5:  1 / that        = 0.113
+
+so the region's target is 0.113.     (a weak push gives a low target)
+
+and for a strong push x = 0.9:   (0.9 − 0.55)·6 = 2.1,  e^−2.1 = 0.122,  1/(1 + 0.122) = 0.891`}</Eq>
+
+            <p><b>idea 5. brakes and tiredness (subtracting).</b></p>
+            <p>
+              things that slow a region down are simply subtracted from x before the sigmoid. there are three:
+              global inhibition (the busier the whole brain, the bigger the minus), fatigue (a region that has been
+              active for a while loses 0.45 times its own tiredness), and the calming regions (negative weights).
+              if the average lift in the brain is 0.1 and GABA is 0.3 then every region loses
+              1.6 · 0.1 · (0.6 + 1.2 · 0.3) = 1.6 · 0.1 · 0.96 = 0.154. a region held 0.8 above rest for 3 seconds has
+              a fatigue of 0.8 · (1 − e^(−3 / 2.2)) = 0.8 · (1 − 0.256) = 0.595, and loses 0.45 · 0.595 = 0.27. you can
+              see that fatigue is just idea 2 again: the tiredness chases the activity with a tau of 2.2 seconds.
+            </p>
+
+            <p><b>idea 6. falling back to rest (the pull home).</b></p>
+            <p>
+              when nothing is happening the push is zero, the target is the resting level, and idea 2 slowly pulls the
+              region back there. that is why a feeling fades by itself and the brain does not need a 'turn off'
+              instruction. the same pull happens for chemicals (they chase their resting target), for the weights
+              (they drift back to their base) and for the slow mood (it chases the fast feeling with a 55 second tau).
+              if you understood idea 2, you have understood about 80 percent of this whole model, because most lines
+              of the brain's code are idea 2 applied to a different number.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 0c. the big formulas, translated into sentences</H3>
+            <p>
+              now the formulas from the rest of the blog, each one said out loud, with a tiny example. use this as a
+              dictionary when a later equation looks scary.
+            </p>
+            <Rows
+              rows={[
+                ["x = bias + gain · (0.6 · synapses + input) + noise − global inhibition − 0.45 · fatigue + chemicals", "'how hard is this region being pushed right now?' start from the resting push (the bias), add what the other regions and the outside world are saying (louder if he is alert, quieter if he is sleepy), add a little randomness, then take away the brakes, and add a nudge from any chemicals that care about this region. the answer is one number."],
+                ["target = sigma(x)", "'turn that push into a dial setting between 0 and 1'. a push of 0.2 gives a target of 0.11, a push of 0.9 gives 0.89."],
+                ["activity += (target − activity) · (1 − e^(−dt / tau))", "'move a bit of the way from where you are to where you want to be, and the bit depends on how fast this region is'. an amygdala at 0.04 with a target of 0.9 moves 0.33 of the 0.86 gap in one step, to 0.32."],
+                ["ex = (activity − rest) / (1 − rest)", "'how far above resting is it, as a share of the room it has left?'. it is the number everything else listens to."],
+                ["input_to_B += w · (a_A − rest_A)", "'region B hears region A in proportion to how much A is above rest, multiplied by how strongly they are wired'."],
+                ["fatigue += ((a − rest) − fatigue) · (1 − e^(−dt / 2.2))", "'tiredness slowly catches up with how active you have been'. same chasing as the dial, but with a tau of 2.2 seconds."],
+                ["level += (target − level) · (1 − e^(−dt / tau))   for a chemical", "same chasing again. dopamine at 0.10 with a target of 0.86 and a tau of 0.45 s closes 63 percent of the gap in 0.45 s, to 0.10 + 0.76 · 0.632 = 0.58. in the real run, dopamine was 0.58 after half a second. that is a check that the maths and the program agree."],
+                ["dopamine target = 0.10 + 0.85 · max(0, rpe) + 0.35 · ex(VTA) − ...", "'dopamine is a small constant, plus a lot of it when something was better than expected, plus a bit when the reward region is busy, minus some when stress is high'. with rpe 0.7 and ex(VTA) 0.54: 0.10 + 0.595 + 0.19 = 0.89, before the stress terms."],
+                ["rpe = outcome − expectedValue", "'how much better or worse was it than i thought?'. praise worth +0.7 when he expected 0 gives +0.7. the same praise when he already expects 0.4 gives only +0.3."],
+                ["HAPPY = pos · (1 − 0.4 · LC)", "'happy is how much the reward circuit is active, a bit less when he is wound up'. say NACC 0.9, VMPFC 0.5, VTA 0.6, OFC 0.4: pos = 0.4·0.9 + 0.25·0.5 + 0.2·0.6 + 0.15·0.4 = 0.36 + 0.125 + 0.12 + 0.06 = 0.665. with a calm LC of 0.03, happy = 0.665 · 0.988 = 0.657 and excited = 0.665 · (0.3 + 0.027) = 0.217. happy is three times bigger, so the label is happy. (i left out the small mood terms to keep it short.)"],
+                ["dx/dt = −1.2·x + 2.2·input − 0.9·others", "'each action's urge leaks away at a steady rate, is topped up by its own reason, and is held down by the urges of the others'. with an input of 0.6 and nobody competing, the urge climbs 0.50 after half a second, 0.77 after one second and reaches its ceiling of about 1.0 after two. that is how the 'building up' of a decision looks."],
+                ["threshold = clamp(0.5 − 0.15·LC + 0.12·conflict, 0.3, 0.7)", "'how much urge do i need before i act? less when i am alert, more when i am torn'. with LC 1.0 and no conflict: 0.35. with LC 0.1 and heavy conflict: 0.605."],
+                ["belief += rate · (observed − belief)", "'after seeing something, move my expectation toward what i saw, by a fraction'. with a rate of 0.25, a belief of 0 and an observation of 0.9 the belief becomes 0.225."],
+                ["Δw = 0.012 · 0.15 · (pre · post · (0.6 + 1.8 · dopamine lift))", "'if two regions were active together and dopamine said that it mattered, strengthen the link by a small amount'. a pre of 0.6, post of 0.9 and a dopamine lift of 0.59 gives 0.0016. tiny each time, big over hundreds of times."],
+              ]}
+            />
+            <p>
+              if there is one habit that helps, it is this: whenever you meet a formula, ask 'what is the target, and
+              what is it chasing from?'. almost every line is a number sliding toward a target at its own speed.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 1. the big picture: what is actually being computed</H3>
+            <p>
+              this is the part that looks scary, so let me say it in plain words first. the whole emotional brain is
+              one list of about 42 numbers (one per region, each between 0 and 1) and one list of 10 numbers (the
+              chemicals). every 20 milliseconds the program nudges every number a little bit toward where it "wants"
+              to be. that is all. there is no hidden trick, no neural network library, no training data. the
+              feelings come out because the numbers push on each other in a loop, the same way a real brain's
+              regions do.
+            </p>
+            <p>
+              how this part is laid out: 0a to 0c are for anyone who finds maths scary: how to read every symbol, the six ideas everything is built from, and every big formula said as a sentence. then maths 1 to 3 build one region from nothing, 4 to 5 connect regions and add
+              the brakes, 6 to 9 are the chemistry and learning, 10 to 14 are what comes out (feelings, instinct,
+              prediction, sleep), 15 to 20 are the reference (order of operations, every region, every pathway, every
+              chemical effect, real runs, every constant), and 21 draws it all as one picture. you can jump to any of
+              them from the list on the left.
+            </p>
+            <p>four words you need and then everything else is just those four used again and again:</p>
+            <Rows
+              rows={[
+                ["activity (a)", "how awake a region is right now. 0 means silent, 1 means as active as it can ever get. every region has a resting value (rest), usually 0.03 to 0.1, because even a quiet brain is never fully off."],
+                ["excitation (ex)", "how far above rest a region is, rescaled so it always runs 0 to 1: ex = (a − rest) / (1 − rest). this is the number every readout uses, so a region that naturally rests at 0.1 and one that rests at 0.03 are compared fairly."],
+                ["weight (w)", "how strongly one region pushes another. positive pushes it up, negative pushes it down. these are the 130 pathways."],
+                ["tau", "how slow a region is, in seconds. small tau (0.04) is a reflex, big tau (0.2) is a slow mood region."],
+              ]}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 2. the sigmoid and the resting level</H3>
+            <p>
+              a region does not respond in a straight line. a tiny push does almost nothing, a medium push does a
+              lot, and a huge push does not do much more than a medium one (it is already near its maximum). that
+              s shaped curve is the sigmoid and it is what keeps every region between 0 and 1 without ever needing
+              a hard clamp.
+            </p>
+            <Eq>{`sigma(x) = 1 / (1 + e^(−6 · (x − 0.55)))
+
+x = 0.25  →  sigma = 0.14     (a weak push, barely wakes it up)
+x = 0.45  →  sigma = 0.35
+x = 0.55  →  sigma = 0.50     (the middle of the curve: the steepest part)
+x = 0.65  →  sigma = 0.65
+x = 0.85  →  sigma = 0.86
+x = 1.10  →  sigma = 0.96     (almost full, more push barely helps)`}</Eq>
+            <p>
+              the 0.55 is where the curve is half way and the 6 is how steep it is. the bias of each region is
+              chosen so that with no input at all the region sits exactly at its rest value. that is done by running
+              the sigmoid backwards: bias = 0.55 + ln(rest / (1 − rest)) / 6. for the nucleus accumbens (rest 0.03)
+              that gives −0.029, so with zero input x = −0.029 and sigma(−0.029) = 0.03, which is exactly its rest.
+              the amygdala (rest 0.04) gets a bias of +0.02 and the PCC (rest 0.1) gets +0.18, because a region that rests higher needs a bigger bias to sit there. so the resting level is
+              not "put in", it falls out of the maths.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 3. one tick of one region, with real numbers</H3>
+            <p>
+              take the nucleus accumbens (NACC), the pleasure and wanting region. its rest is 0.03, tau 0.08 s. a
+              person praises him. the praise is appraised as reward 0.8, social 0.9, novelty 0.25 at an intensity of
+              0.7. here is the chain, one link at a time.
+            </p>
+            <Bullets
+              items={[
+                ["1. attention scaling", "weak stimuli get less attention. g = 0.55 + 0.45 · intensity = 0.55 + 0.45 · 0.7 = 0.865. so the reward that reaches the brain is 0.8 · 0.865 = 0.692."],
+                ["2. the drive table", "reward drives NACC with a strength of 0.85, so the NACC is pushed with 0.85 · 0.692 = 0.588. at the same moment it pushes the VTA with 0.95 · 0.692 = 0.657, the value area with 0.55 · 0.692 = 0.38 and so on."],
+                ["3. the envelope", "the push does not switch on instantly. it ramps in over 0.25 s (attack = min(1, t / 0.25)), stays for the duration of the stimulus, then fades out over 3 s. so 0.1 s in, only 40 percent of the drive is on: 0.235."],
+                ["4. the sum", "x = bias + gain · (0.6 · synapses + drive) = −0.029 + 1.0 · (0 + 0.235) = 0.206. gain is about 1 for a calm awake brain."],
+                ["5. the target", "sigma(0.206) = 1 / (1 + e^(−6 · (0.206 − 0.55))) = 1 / (1 + e^2.06) = 0.113. so the region 'wants' to be at 0.113."],
+                ["6. the nudge", "the step is a fraction of the gap: 1 − e^(−dt / tau) = 1 − e^(−0.02 / 0.08) = 0.221. so activity goes 0.03 + (0.113 − 0.03) · 0.221 = 0.048 in this 20 ms step."],
+                ["7. repeat", "50 times a second. as the envelope rises to full strength the drive becomes 0.588, x becomes 0.559, the target becomes 0.51 and activity chases it."],
+              ]}
+            />
+            <p>
+              the drive alone would only take the NACC to about 0.5. but in the real run it reaches 0.92 within half a
+              second. the extra comes from the loop: the VTA lights up (0.54), the VTA pushes the NACC with a weight
+              of 0.9, dopamine rises and gives the NACC another +0.3 · (dopamine − 0.1), and the NACC pushes the value
+              area, which pushes back. each region adds a bit, the sigmoid turns those bits into a big jump, and the
+              result is a snowball that is stopped only by global inhibition and fatigue. that snowball is what a feeling
+              is.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 4. the synapse sum, and why big regions push harder</H3>
+            <p>for each connection from region A to region B, B receives this every step:</p>
+            <Eq>{`input_to_B  +=  w(A→B) · scale · (a_A − rest_A)
+
+scale = min( sqrt( max(0.25, neurons_A / 80) ), 4.5 )
+across hemispheres:   w is multiplied by the 'contralateral' factor (0.35)`}</Eq>
+            <Bullets
+              items={[
+                ["why a_A minus rest_A", "a region that is just sitting at rest sends nothing. only the extra activity travels down the wire. this is why a quiet brain stays quiet instead of every region adding a constant to every other."],
+                ["why the square root of neurons", "a region with more neurons has more cells firing and so a stronger signal, but a region with 4 times the neurons is not 4 times as loud, it is twice as loud. the square root is the usual compromise. the cerebellum would be huge, so the scale is capped at 4.5."],
+                ["why 0.6 (SYN)", "all synaptic input is multiplied by 0.6 before it is added in. it keeps loops from running away: a 1.0 would make strong loops saturate everything, a 0.3 would make nothing spread."],
+                ["the other hemisphere", "left and right copies of a region talk to each other across the corpus callosum, which in the model is a 35 percent weight. a stimulus on the left side drives the left copy first and the right copy about a third as hard."],
+              ]}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 5. the three brakes: global inhibition, fatigue and noise</H3>
+            <p>
+              without brakes, a brain with positive loops would blow up to all 1s the first time anything happened.
+              there are three brakes and each one works on a different time scale.
+            </p>
+            <Rows
+              rows={[
+                ["global inhibition (instant)", "1.6 · (mean lift across all regions) · (0.6 + 1.2 · GABA). 'mean lift' is the average of (a − rest). if the brain is busy, this number is big, and it is subtracted from every region at once. with normal GABA 0.3 it is 1.6 · lift · 0.96. so if the average region is 0.1 above rest, every region loses 0.15 from its x. this is how the brain stays selective: you cannot light up everything at once."],
+                ["fatigue (seconds)", "each region keeps a slow copy of how active it has been: fatigue += ((a − rest) − fatigue) · (1 − e^(−dt / 2.2)). then x loses 0.45 · fatigue. a region held at 0.8 above rest for 3 seconds builds about 0.6 fatigue, which takes away about 0.27 from x. that is part of why the amygdala peak in the real run is a peak and not a plateau: it sits at 0.92 to 0.99 for two seconds and is down to 0.27 at three, helped by the stimulus fading out and by the tiring."],
+                ["noise (always)", "every region has its own wobble: noise += −noise · dt / 0.25 + 0.08 · sqrt(dt) · gauss. the −noise · dt / 0.25 part pulls it back to zero with a memory of 0.25 s, the second part kicks it randomly. the sqrt(dt) is there so the amount of wobble does not depend on how small the time steps are. the typical size is about 0.08 · sqrt(0.25 / 2) = 0.03, which is small but enough to let a borderline decision go either way."],
+              ]}
+            />
+            <p>
+              one more thing about time steps: the real frame might be 16 ms or 60 ms depending on the computer. the
+              brain never takes a step bigger than 0.02 s (it splits a long frame into several sub steps) and never
+              advances more than 0.25 s in one frame even if the tab was frozen. this makes the maths stable: the same
+              stimulus gives the same shape of response on a slow laptop and a fast one.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 6. outcome, surprise and expectation</H3>
+            <p>
+              besides driving regions, every stimulus is also boiled down to a single number: how good or bad was
+              that, from −1 to +1. this is the number the dopamine system learns from.
+            </p>
+            <Eq>{`outcome = clamp( 0.6·valence + 0.5·reward − 0.7·threat − 0.6·pain
+                 − 0.4·loss − 0.3·disgust + 0.2·social , −1, 1 ) · intensity
+
+rpe             = outcome − expectedValue          (reward prediction error)
+expectedValue  += 0.15 · rpe                        (the brain slowly learns what to expect)
+rpe decays      : rpe · e^(−dt / 2.5)`}</Eq>
+            <Rows
+              rows={[
+                ["praise, 0.7 intensity", "0.6·0.8 + 0.5·0.8 + 0.2·0.9 = 1.06, clamped to 1, times 0.7 = +0.70. the expectation is 0, so rpe = +0.70. in the real run the rpe reads 0.67 a tenth of a second later (decayed by e^(−0.1/2.5) = 0.96)."],
+                ["scolding, 0.8 intensity", "0.6·(−0.6) − 0.7·0.3 − 0.4·0.5 + 0.2·0.85 = −0.60, times 0.8 = −0.48. the run shows −0.46."],
+                ["loud noise, 0.95 intensity", "0.6·(−0.5) − 0.7·0.75 = −0.825, times 0.95 = −0.78. the run shows −0.75."],
+                ["the same praise again", "expectedValue is now 0.15 · 0.70 = 0.105, so the next identical praise gives rpe = 0.70 − 0.105 = 0.595, a bit smaller. after ten praises the expectation is about 0.6 and the praise barely registers any more. that is habituation of reward, and it is why a gift every minute stops being a gift."],
+              ]}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 7. the ten chemical equations, with the real gains</H3>
+            <p>
+              every chemical follows its own target with its own speed: level += (target − level) · (1 − e^(−dt / tau)).
+              the target is built from what the regions are doing, so chemistry is a slow echo of activity, and then
+              the chemistry feeds back and changes the regions. the actual targets in the code are:
+            </p>
+            <Eq>{`dopamine       = 0.10 + 0.85·max(0, rpe) + 0.35·ex(VTA)
+                 − 0.25·max(0, cortisol − 0.2) − 0.12·max(0, serotonin − 0.55)
+                 + 0.025·max(0, −rpe)                        tau 0.45 s
+noradrenaline  = 0.10 + 1.0·ex(LC) + 0.35·startle − 0.2·max(0, melatonin − 0.2)
+                                                              tau 1.0 s   (0.02 when asleep)
+serotonin      = 0.40 + 0.9·ex(RAPHE) − 0.25·ex(SGACC)
+                 − 0.2·max(0, cortisol − 0.25) + 0.15·socialPos   tau 6 s
+cortisol       = 0.10 + 1.3·ex(HYP)·(0.4 + ex(AMY)) − 0.15·max(0, oxytocin − 0.2)
+                                                              tau 18 s
+oxytocin       = 0.10 + 0.9·socialPos + 0.15·max(0, lastOutcome)   tau 6 s
+adrenaline     = 0.05 + 1.4·ex(HYP)·(0.3 + ex(AMY)) + 0.35·ex(LC) + 0.4·startle
+                                                              tau 2.5 s
+endorphin      = 0.10 + 1.5·ex(PAG) + 0.3·ex(NACC) + 0.2·max(0, rpe)   tau 7 s
+acetylcholine  = 0.15 + 1.2·ex(BF) + 0.1·max(0, rpe)           tau 1.5 s (0.08 asleep)
+GABA           = 0.30 + 2.4·meanLift + (0.25 if asleep)        tau 3 s
+melatonin      = 0.9 if asleep else 0.1                        tau 8 s`}</Eq>
+            <Bullets
+              items={[
+                ["why the taus are different", "dopamine is a spike (0.45 s): it is there for the moment of surprise and gone. cortisol is 18 s: stress rises slowly and lingers on purpose, because real stress hormones take minutes to clear. adrenaline is 2.5 s, a fast surge but not as fast as the first jolt of noradrenaline."],
+                ["the cross talk", "the minus terms are the interesting part. high cortisol pushes dopamine down (stress kills motivation), high oxytocin pushes cortisol down (being with someone safe calms you), high serotonin takes a little dopamine away (calm brains want less), and sadness (SGACC) pulls serotonin down (rumination makes you feel worse)."],
+                ["what the real run shows", "after the loud noise noradrenaline climbs 0.10 → 0.26 → 0.65 → 0.87 over two seconds and adrenaline follows 0.05 → 0.11 → 0.34 → 0.56, but cortisol only creeps 0.10 → 0.21 in three seconds and is still 0.17 twelve seconds later. praise did the opposite: dopamine jumps to 0.69 in one second then falls back, while oxytocin climbs slowly 0.10 → 0.37 and is still 0.28 at twelve seconds. fast chemistry is the spike, slow chemistry is the memory."],
+              ]}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 8. how chemicals push back on the regions</H3>
+            <p>
+              the loop closes here. each region gets a small extra term in x from the chemicals, always relative to
+              the resting level of that chemical (so at rest the term is exactly zero):
+            </p>
+            <Rows
+              rows={[
+                ["whole brain gain", "gain = (0.45 if asleep else 1) · (1 + 0.3·(NA − 0.1) + 0.2·(adrenaline − 0.05)) · (1 − 0.3·(melatonin − 0.1)). at noradrenaline 0.87 and adrenaline 0.56 the gain is 1 + 0.23 + 0.10 = 1.33: every input is 33 percent louder, so the second loud noise hits a brain that is already jumpy."],
+                ["nucleus accumbens", "+0.3·(dopamine − 0.1) + 0.15·(oxytocin − 0.1) + 0.15·(endorphin − 0.1). with dopamine at 0.69 that alone adds +0.18 to x, which is a third of the way from the bottom to the middle of the sigmoid."],
+                ["amygdala", "+0.25·(cortisol − 0.1) − 0.3·(serotonin − 0.4) − 0.25·(oxytocin − 0.1) + 0.15·(NA − 0.1). so a stressed, low serotonin, lonely brain has an amygdala that is easier to set off, and a calm, bonded one is harder."],
+                ["every region, the GABA brake", "through global inhibition (above). high GABA makes the whole brain harder to recruit."],
+              ]}
+            />
+            <p>
+              this is what i mean by "chemistry makes him moody". no flag says "he is grumpy". it is that cortisol is
+              0.2 and serotonin is 0.35, so the amygdala's x is higher by about 0.04, so a small startle that would
+              have been ignored crosses the middle of the sigmoid and becomes a flinch.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 9. learning inside the brain: dopamine gated plasticity</H3>
+            <p>
+              the weights are not fixed. every 0.15 seconds (and only while awake) each pathway is allowed to change a
+              little. the rule is the classic 'cells that fire together wire together', but only when dopamine says
+              the moment mattered:
+            </p>
+            <Eq>{`pre  = max(0, a_from − rest_from)        post = max(0, a_to − rest_to)
+if pre or post is below 0.04:  w drifts back toward its base weight
+else:
+  hebb = pre · post · (0.6 + 1.8 · max(0, dopamine − 0.1))
+  ltd  = pre · (1 − post) · 0.25 · max(0, 0.1 − dopamine)
+  Δw   = 0.012 · 0.15 · (hebb − ltd)  +  (base − w) · 0.004 · 0.15
+w stays between 0.15·|base| and 2.8·|base| + 0.15       (inhibitory brakes are never changed)`}</Eq>
+            <p>a worked example. during the praise, the VTA is at 0.60 above rest and the NACC at 0.9, and dopamine is 0.69:</p>
+            <Bullets
+              items={[
+                ["hebb", "0.60 · 0.9 · (0.6 + 1.8 · 0.59) = 0.54 · 1.66 = 0.90"],
+                ["Δw per tick", "0.0018 · 0.90 = +0.0016, minus a tiny pull back toward base"],
+                ["over the praise", "the praise lasts about 2 seconds, which is 13 plasticity ticks: roughly +0.02 on a pathway whose base weight is 0.9. that is a 2 percent stronger link from one nice moment."],
+                ["why it is slow on purpose", "after fifty nice moments the link has gone up by a lot (but never beyond 2.8 times its base), so he really does 'like' what he has been rewarded for. one bad day cannot rewrite his brain, and the homeostatic pull means that if the praise stops the link slowly walks home."],
+                ["sleep", "while asleep, 2 percent of the ticks run the update at nearly three times the strength (0.4 instead of 0.15). that is the 'replay' that consolidates the day, like in a real sleeping brain."],
+                ["what survives a restart", "only pathways that have moved more than 0.02 from their base are saved, together with the learned action values and the expected value."],
+              ]}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 10. the emotion readout, one score at a time</H3>
+            <p>
+              the label never gets set. it is read from the regions. here is the complete table of what each score
+              really adds up, using the ex() values (0 to 1) of the regions listed:
+            </p>
+            <Eq>{`pos       = 0.4·NACC + 0.25·VMPFC + 0.2·VTA + 0.15·OFC + 0.18·moodValence
+
+HAPPY     = pos · (1 − 0.4·LC) · (1 + 0.15·max(0, moodValence))
+EXCITED   = pos · (0.3 + 0.9·LC) · (0.85 + 0.3·moodArousal)
+FEARFUL   = 0.45·AMY + 0.2·PAG + 0.2·LC + 0.15·INS − 0.2·pos + 0.12·max(0, −moodValence)
+ANGRY     = 0.2·ACC + 0.12·HYP + 0.35·PUT + 0.15·CAUD + 0.12·PMC − 0.2·pos + 0.08·max(0, −moodValence)
+DISGUSTED = 0.45·INS + 0.25·OLF + 0.15·PUT + 0.15·OFC − 0.25·S1
+SAD       = 0.4·SGACC + 0.2·PCC + 0.15·INS + 0.1·AMY
+            + 0.12·clamp((0.14 − dopamine)/0.14) − 0.25·pos + 0.2·max(0, −moodValence)
+PAIN      = 0.3·S1 + 0.3·ACC + 0.25·INS + 0.15·PAG
+CURIOUS   = 0.25·ACC + 0.2·SC + 0.25·HIPP + 0.15·DLPFC + 0.15·VTA − 0.3·AMY + 0.1·moodArousal
+SURPRISED = 0.5·startle + 0.25·SC + 0.25·LC`}</Eq>
+            <Bullets
+              items={[
+                ["why happy and excited share a circuit", "both are 'pos'. the only difference is the locus coeruleus (alertness). high LC makes happy smaller (1 − 0.4·LC) and excited bigger (0.3 + 0.9·LC). so the same reward feeling is calm happiness when he is relaxed and excitement when he is wired. in the real praise run LC stays at 0.03, so the label is happy."],
+                ["why there are minus terms", "fear is reduced by pos (−0.2·pos) and sad is reduced by pos (−0.25·pos). it is hard to be sad and delighted in the same instant, so the positive circuit actively subtracts from the negative scores."],
+                ["why disgust subtracts S1", "a touch of real body sensation (S1) says 'this is pain, not disgust'."],
+                ["mood adds a bias", "the slow moodValence is added or subtracted in several places, so after a hard day he is a bit more fearful, angry and sad for the same input. one gentle sentence will not instantly cure that."],
+              ]}
+            />
+            <p>then the winner is picked with hysteresis, so his face does not flicker:</p>
+            <Eq>{`smooth_k    += (score_k − smooth_k) · (1 − e^(−dt / 0.25))
+best         = argmax smooth_k
+switch if    best ≠ current  and  smooth_best > 1.15 · smooth_current + 0.01  and  smooth_best ≥ 0.20
+fall to NEUTRAL (or CALM if serotonin > 0.5) when everything is below 0.20
+intensity    = smooth_label / 0.65   (clamped 0..1)
+mood        += (fast − mood) · (1 − e^(−dt / 55))      for both valence and arousal
+valence      = clamp( (pos − max(fearful, angry, disgusted, sad, pain)) · 1.6 , −1, 1 )`}</Eq>
+            <p>
+              look at the scolding run for how this plays out in time. at 0.5 s the amygdala (0.36) and locus
+              coeruleus (0.42) lead, so the label is fearful at 0.32. the sad circuit (subgenual cingulate) is
+              slower, it has a tau of 0.2 s and takes a push from the loss drive of 0.9·0.5, so by 2 s it has built up
+              to 0.34, sad overtakes fearful and the label flips to sad (0.57). that is a nice little story the maths
+              tells all by itself: first fright, then hurt. nobody wrote that sequence down.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 11. the instinct race: the maths of "i just reacted"</H3>
+            <p>
+              ten actions run a race (OBSERVE, APPROACH, GREET, INVESTIGATE, FREEZE, FLEE, CONFRONT, WITHDRAW, REJECT,
+              RECOIL). each action has a level x between 0 and 1.5 that builds up like water in a leaky bucket:
+            </p>
+            <Eq>{`dx/dt = −1.2·x  +  2.2·input  −  0.9·(sum of all the other x's)  +  noise
+noise = 0.35 · gauss / sqrt(dt) · (0.08 + 0.12·conflict + 0.06·|LC − 0.3|)
+
+threshold = clamp(0.5 − 0.15·LC + 0.12·conflict , 0.3, 0.7)
+conflict  = (1 − gap/x_lead) · clamp(x_lead / 0.4)          gap = x_lead − x_second`}</Eq>
+            <Bullets
+              items={[
+                ["−1.2·x, the leak", "evidence drains away if it is not topped up. so a momentary spike of fear that disappears does not make him run."],
+                ["+2.2·input, the push", "the input of each action is built from the regions that support it. with nothing fighting it, x settles at 2.2·input / 1.2 = 1.83·input, so an input of 0.27 is just enough to reach the 0.5 threshold."],
+                ["−0.9·others, the competition", "every action suppresses the others in proportion to how high they are. a clear winner pulls away from the pack, and two equal rivals hold each other down. that is the 'torn' feeling."],
+                ["threshold falls with alertness", "high LC lowers it (down to 0.35 at LC = 1), so a startled brain commits faster. high conflict raises it (up to 0.62) so a confused brain waits for more evidence."],
+                ["the hold time", "an action can only change after 1.2 + 1.4·conflict seconds since the last one. at full conflict that is 2.6 seconds of hesitation, which is the visible pause before he decides."],
+                ["leaving an action", "if the evidence for the current action falls below 55 percent of the threshold for 1.5 seconds, he goes back to observing."],
+              ]}
+            />
+            <p>the inputs themselves, in full (fear is the FEARFUL score from above, social is a mix of FFA, TPJ, MPFC and Wernicke):</p>
+            <Eq>{`OBSERVE     = 0.22
+APPROACH    = (0.5·NACC + 0.25·VMPFC + 0.25·VTA) · (1 − 0.9·fear) · (1 − 0.6·social) · 1.1
+GREET       = social · (0.25 + pos) · clamp(1 − fear − angry) · 2.0
+INVESTIGATE = (0.3·ACC + 0.25·SC + 0.25·HIPP + 0.2·VTA) · (1 − 0.8·fear) · 1.9
+FREEZE      = (0.45·AMY + 0.25·PAG) · (0.35 + startle) · 1.5
+FLEE        = fear · (0.95 − 0.55·startle)
+CONFRONT    = angry · 1.9          WITHDRAW = sad · 1.05
+REJECT      = disgusted · 1.05     RECOIL   = pain · 1.1
+every action also gets   + 0.55·learnedValue  +  0.55·epistemicValue`}</Eq>
+            <p>
+              read FREEZE and FLEE together and you see the whole fear story. a sudden loud noise makes startle high
+              (say 0.8), so FREEZE gets (0.45·0.97 + 0.25·0.3) · 1.15 · 1.5 = 0.88, while FLEE gets only
+              fear · (0.95 − 0.44) = 0.51 · fear. freeze wins first. as the startle decays (it halves every 0.55 s,
+              e^(−dt/0.8)), FREEZE shrinks and FLEE grows, and the real run does exactly that: freeze at 1 and 2
+              seconds, then flee at 3 seconds. that is the sequence real animals show, and it comes from two lines of
+              arithmetic.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 12. how the instinct layer learns what to do</H3>
+            <p>
+              every action has a learned value between −1 and +1, and every supporting region has a learned gain
+              (starts at 1) onto the actions it supports. when the outcome of what he did is known, both are changed
+              with the same rpe that dopamine uses:
+            </p>
+            <Eq>{`when an action wins:   eligibility[action] = 1,   eligibility[others] = max(itself, 0.15)
+eligibility decays:    × e^(−dt / 3.0)
+
+on every outcome:
+  value[a]        += 0.08 · rpe · eligibility[a]           (clamped −1..1)
+  gain[region→a]  += 0.04 · rpe · eligibility[a]           (only if |rpe| > 0.05, clamped 0.25..2.5)`}</Eq>
+            <Bullets
+              items={[
+                ["credit assignment", "the eligibility trace is how the brain knows which action to blame. the one that just won has trace 1, so it gets the full update. the others have a small 0.15 trace, so they learn a little too (a rough 'similar actions' effect)."],
+                ["worked example", "he approaches a person (APPROACH wins, eligibility 1). the person praises him, rpe = +0.6. value[APPROACH] += 0.08 · 0.6 · 1 = +0.048. next time APPROACH gets 0.55 · 0.048 = +0.026 extra input. small, but 20 praised approaches later it is +0.5 and approaching has become a habit."],
+                ["and the other way", "if he approaches and is scolded (rpe −0.6) the same update subtracts 0.048, and the gains of NACC, VMPFC and VTA onto APPROACH drop by 0.04 · 0.6 = 0.024 each. so approaching gets quieter from both sides."],
+                ["the outside world too", "the thinking brain's real outcomes (a play that succeeded, being scolded) are sent in through externalOutcome with a slightly stronger 0.12 rate, so both layers learn from the same events."],
+              ]}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 13. predictive processing: the brain that guesses first</H3>
+            <p>
+              the last piece is a small model of 'what do i expect to happen next'. it keeps a belief for 13 features
+              (valence, arousal, threat, reward, social, novelty, disgust, pain, loss, anger, face, familiarity,
+              intensity) and every time something happens it compares the guess with the truth.
+            </p>
+            <Eq>{`predict:   start from belief, then bend it with the chemistry
+           reward  += 0.25·(dopamine − 0.15)       threat  += 0.3·(cortisol − 0.1) + 0.2·(NA − 0.1)
+           social  += 0.35·(oxytocin − 0.1)        novelty += 0.4·uncertainty
+           arousal += 0.25·(NA − 0.1) + 0.15·(adrenaline − 0.05) − 0.2·(melatonin − 0.1)
+
+error:     pe = mean over the 13 features of |observed − predicted|
+
+uncertainty = clamp( 0.55·uncertainty + 0.45·peEma + 0.08·(pe > 0.35) , 0.08, 0.95 )
+peEma       = 0.7·peEma + 0.3·pe
+
+learn:     rate = clamp( 0.12 + 0.35·acetylcholine + 0.2·uncertainty , 0.05, 0.55 )
+           belief += rate · (observed − belief)
+
+idle:      uncertainty −= 0.015 per second, peEma −= 0.02 per second`}</Eq>
+            <p>a full worked example, the very first praise on a fresh brain (uncertainty 0.45, acetylcholine 0.15, everything else at rest):</p>
+            <Bullets
+              items={[
+                ["the guess", "belief is almost zero, novelty is 0.2 + 0.4·0.45 = 0.38 and the chemistry bends valence by −0.01. so the brain expects 'nothing much, a bit new'."],
+                ["the truth", "valence 0.8, arousal 0.5, reward 0.8, social 0.9, novelty 0.25, intensity 0.7. the errors are 0.81, 0.5, 0.8, 0.9, 0.13, 0.7 (the rest are 0). the sum is 3.84 over 13 features: pe = 0.295."],
+                ["the new uncertainty", "peEma = 0.7·0.3 + 0.3·0.295 = 0.30. uncertainty = 0.55·0.45 + 0.45·0.30 = 0.38. it dropped a little because the surprise was moderate."],
+                ["the learning", "rate = 0.12 + 0.35·0.15 + 0.2·0.38 = 0.25. so the belief about 'social' jumps from 0 to 0.25 · 0.9 = 0.22. next time someone speaks, he expects some social content, and a repeat of the same praise will be less of a surprise."],
+                ["epistemic value of looking closer", "INVESTIGATE gets 0.85·u + 0.55·pe + 0.15·socialU = 0.85·0.38 + 0.55·0.295 + 0.15·0.24 = 0.52, which becomes 0.55 · 0.52 = +0.29 added to its race input. so a surprised, unsure brain is pushed to look into things. a bored, certain one is not (u falls to 0.08 after a long quiet time, giving 0.07)."],
+                ["where attention comes in", "acetylcholine (from the basal forebrain, driven by novelty and threat) raises the learning rate: at 0.8 acetylcholine the rate is 0.12 + 0.28 + 0.08 = 0.48, almost twice the one above. that is the 'pay attention and you learn faster' effect."],
+              ]}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 14. sleep in the maths</H3>
+            <p>
+              sleep is not a switch that stops the brain, it is a change of settings. while asleep: the global gain is
+              multiplied by 0.45, stimuli are 15 percent as strong (env × 0.15), noradrenaline is pinned near 0.02,
+              serotonin near 0.25, acetylcholine near 0.08, GABA gets +0.25, and melatonin heads to 0.9 with a time
+              constant of 8 s. the slow waves and hippocampal replay bursts run on top, and plasticity runs in the
+              stronger replay mode. only a pain stimulus, or anything where max(threat, pain, anger) · intensity is
+              above 0.6, can wake it. that is how he stays asleep through a person walking by but wakes immediately to
+              a loud bang.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 15. what happens in one 20 ms step, in order</H3>
+            <p>
+              this is the exact order the program does things, every sub step. if you ever want to follow the code,
+              this is the map. the whole emotional brain is one function that does these 14 things and then does them
+              again 20 ms later.
+            </p>
+            <Rows
+              rows={[
+                ["1. clear the input", "every region's stimulus input is set to 0."],
+                ["2. play the stimuli", "for every stimulus that is still in front of him: advance its clock, compute its envelope (ramp in over 0.25 s, hold for its duration, fade over 3 s, times 0.15 if asleep), and add its drive to each region it targets. the left or right copy gets more or less depending on the side factor (1 ± 0.6 · laterality). also work out socialPos = social · max(valence, 0.9 · reward) · envelope, and smooth it with a 1.5 s time constant."],
+                ["3. the whole brain gain", "(0.45 if asleep, else 1) · (1 + 0.3 · (NA − 0.1) + 0.2 · (adrenaline − 0.05)) · (1 − 0.3 · (melatonin − 0.1))."],
+                ["4. the synapses", "for every pathway, add w · (activity_from − rest_from) to the target. the w is the live plastic weight, not the base one."],
+                ["5. global inhibition", "1.6 · mean lift · (0.6 + 1.2 · GABA), where mean lift is how far above rest the average node is."],
+                ["6. noise", "each node's own smooth wobble moves one step."],
+                ["7. the sum x", "x = bias + gain · (0.6 · synapses + input) + noise − global inhibition − 0.45 · fatigue + the chemical term for that region. if an emotion is being forced from the lab, its drive is added too. in sleep, cortex gets a slow wave of +0.25 · slow − 0.1, and the hippocampus gets bursts of replay."],
+                ["8. the target and the nudge", "target = sigma(x). activity += (target − activity) · (1 − e^(−dt / tau)), using the tau of that region."],
+                ["9. fatigue", "fatigue follows how far above rest the region was, with a 2.2 s time constant."],
+                ["10. the ten chemicals", "each one moves toward its target (all ten equations above), startle decays with a 0.8 s time constant and rpe with a 2.5 s one."],
+                ["11. plasticity", "every 0.15 s, if awake, run the three factor update on every pathway. asleep, run a stronger one on 2 percent of steps."],
+                ["12. the generative model", "if no stimulus is in front of him, uncertainty and prediction error relax toward calm."],
+                ["13. the readouts", "the emotion scores are computed from the regions, smoothed, and the label may switch. the instinct race advances and may commit an action."],
+                ["14. bookkeeping", "track the peak emotion of this episode, and every 0.12 s rebuild the list of the 40 strongest active pathways for the viewer (the glowing lines you see)."],
+              ]}
+            />
+            <p>
+              a stimulus is also processed once at the moment it arrives, before any of the above: the brain wakes up
+              if it is asleep and the stimulus is dangerous enough, the startle is set to
+              max(startle, novelty · (0.5 + 0.5 · arousal) · (0.5 + intensity) + 0.6 · threat · intensity), the
+              generative model observes it, and the outcome and rpe are computed. for the loud noise that is
+              0.85 · 0.95 · 1.45 + 0.6 · 0.75 · 0.95 = 1.17 + 0.43, which is clamped to 1.0: a full startle.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 16. every region and its numbers</H3>
+            <p>
+              this is the full table of the 42 regions with their speed (tau, in seconds) and resting activity.
+              the neuron count is only used for the weight of its outgoing pathways (the square root rule), it is not
+              a real cell count. the three groups are the cerebrum, the cerebellum and the brainstem.
+            </p>
+            <Rows
+              rows={[
+                ["LGN", "vision relay. tau 0.04, rest 0.03, 18 neurons. as fast as anything in the brain."],
+                ["V1", "first visual cortex. tau 0.06, rest 0.04, 140 neurons."],
+                ["V2V4", "colour and shape. tau 0.07, rest 0.04, 160 neurons."],
+                ["MT", "motion. tau 0.07, rest 0.03, 70 neurons."],
+                ["IT", "objects. tau 0.08, rest 0.04, 120 neurons."],
+                ["FFA", "faces. tau 0.08, rest 0.03, 90 neurons."],
+                ["MGN", "hearing relay. tau 0.04, rest 0.03, 16 neurons."],
+                ["A1", "first auditory cortex. tau 0.06, rest 0.04, 80 neurons."],
+                ["WERN", "understanding words. tau 0.10, rest 0.03, 95 neurons."],
+                ["BROCA", "forming speech. tau 0.10, rest 0.03, 90 neurons."],
+                ["S1", "touch and pain location. tau 0.06, rest 0.03, 110 neurons."],
+                ["M1", "movement commands. tau 0.07, rest 0.03, 100 neurons."],
+                ["PMC", "movement planning. tau 0.09, rest 0.03, 110 neurons."],
+                ["PPC", "where things are. tau 0.10, rest 0.05, 140 neurons."],
+                ["DLPFC", "deliberate thinking. tau 0.15, rest 0.05, 150 neurons."],
+                ["MPFC", "self and others. tau 0.15, rest 0.07, 110 neurons."],
+                ["VMPFC", "value and calming. tau 0.15, rest 0.05, 95 neurons."],
+                ["OFC", "good or bad. tau 0.12, rest 0.04, 95 neurons."],
+                ["ACC", "conflict and the ouch of pain. tau 0.12, rest 0.05, 85 neurons."],
+                ["SGACC", "sadness. tau 0.20 (the slowest cortex), rest 0.04, 40 neurons."],
+                ["TPJ", "other minds. tau 0.12, rest 0.04, 85 neurons."],
+                ["PCC", "self and rumination. tau 0.20, rest 0.10 (the highest resting level), 90 neurons."],
+                ["TPOLE", "meaning of people and things. tau 0.12, rest 0.03, 80 neurons."],
+                ["INS", "gut feeling and disgust. tau 0.10, rest 0.05, 90 neurons."],
+                ["AMY", "danger and importance. tau 0.05, rest 0.04, 50 neurons. a fast alarm."],
+                ["HIPP", "memory. tau 0.12, rest 0.05, 75 neurons."],
+                ["PHC", "place and context. tau 0.12, rest 0.04, 50 neurons."],
+                ["HYP", "stress hormones. tau 0.15, rest 0.05, 30 neurons."],
+                ["NACC", "pleasure and wanting. tau 0.08, rest 0.03, 40 neurons."],
+                ["VTA", "dopamine source. tau 0.06, rest 0.05, 25 neurons."],
+                ["CAUD", "goal directed choice. tau 0.10, rest 0.04, 60 neurons."],
+                ["PUT", "habit and motor selection. tau 0.09, rest 0.04, 75 neurons."],
+                ["THAL", "the gate. tau 0.05, rest 0.08, 95 neurons."],
+                ["OLF", "smell. tau 0.08, rest 0.03, 40 neurons."],
+                ["CB", "cerebellum. tau 0.07, rest 0.06, 11,500 neurons, which is about 80 percent of all of them, and its outgoing weight is capped at a scale of 4.5."],
+                ["SC", "snap attention. tau 0.04, rest 0.03, 22 neurons."],
+                ["PAG", "freeze, fight, flee, pain control. tau 0.08, rest 0.03, 22 neurons, midline."],
+                ["LC", "noradrenaline. tau 0.08, rest 0.05, 12 neurons."],
+                ["RAPHE", "serotonin. tau 0.20, rest 0.10, 18 neurons, midline. slow on purpose, mood is slow."],
+                ["BF", "acetylcholine and attention. tau 0.08, rest 0.04, 20 neurons."],
+                ["RF", "reticular formation, general wakefulness. tau 0.10, rest 0.08, 45 neurons, midline."],
+              ]}
+            />
+            <p>
+              a few things you can read off this table. the alarm (amygdala, tau 0.05) is the fastest thing in the
+              whole emotional brain, which is why fear starts before thinking can finish. the mood and rumination
+              areas (subgenual cingulate, posterior cingulate, raphe) are the slowest at 0.2, which is why sadness
+              builds late and fades late. and the regions with the highest rest (PCC 0.10, RAPHE 0.10, THAL 0.08,
+              RF 0.08) are the ones that are never quite off: the default mode, the calm and the gate.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 17. every pathway, by circuit</H3>
+            <p>
+              these are all the connections in the anatomy (positive excites, negative inhibits). a weight of 0.9 is
+              a strong link, 0.2 is a whisper. these are the base weights. the live ones drift from these with
+              experience (maths 9). each line is from → to, weight.
+            </p>
+            <Rows
+              rows={[
+                ["vision", "LGN → V1 0.9, V1 → V2V4 0.8, V2V4 → MT 0.55, V2V4 → IT 0.7, V2V4 → FFA 0.55, IT → FFA 0.35, MT → PPC 0.55, PPC → DLPFC 0.35, IT → TPOLE 0.4, IT → AMY 0.35, FFA → AMY 0.35, FFA → TPJ 0.4, FFA → MPFC 0.2, V1 → SC 0.2, SC → PPC 0.3, SC → THAL 0.25, IT → HIPP 0.25, IT → PHC 0.3, MT → SC 0.2"],
+                ["hearing + language", "MGN → A1 0.9, A1 → WERN 0.7, WERN → BROCA 0.55, WERN → TPJ 0.35, WERN → DLPFC 0.3, A1 → AMY 0.3, WERN → TPOLE 0.35, BROCA → PMC 0.35, BROCA → M1 0.25, A1 → SC 0.25"],
+                ["touch + pain", "THAL → S1 0.7, S1 → M1 0.3, S1 → INS 0.55, S1 → PPC 0.3, INS → ACC 0.45, ACC → INS 0.3, THAL → INS 0.4, PAG → THAL 0.2, S1 → ACC 0.25"],
+                ["smell", "OLF → AMY 0.65, OLF → OFC 0.55, OLF → HIPP 0.3, OLF → INS 0.4. smell skips the thalamus, so a smell reaches the amygdala and memory directly. that is why a smell can bring back a memory or a feeling instantly."],
+                ["the threat circuit", "AMY → HYP 0.7, AMY → PAG 0.7, AMY → LC 0.55, AMY → INS 0.35, AMY → ACC 0.35, AMY → HIPP 0.35, AMY → SC 0.2, AMY → NACC 0.15, INS → AMY 0.4, HYP → PAG 0.35, PAG → RF 0.4, LC → AMY 0.25, HIPP → AMY 0.2, ACC → AMY 0.15"],
+                ["the brakes (the only negative ones)", "VMPFC → AMY −0.5, OFC → AMY −0.3, DLPFC → AMY −0.25, MPFC → AMY −0.2, and SGACC → VTA −0.3. four of the five calm the amygdala, which is why a brain with a healthy front can talk itself down. the fifth is the sad region cutting the reward region. these are the only pathways that never change with plasticity."],
+                ["reward", "VTA → NACC 0.9, VTA → VMPFC 0.5, VTA → OFC 0.35, NACC → VTA 0.25, OFC → NACC 0.5, VMPFC → NACC 0.5, AMY → OFC 0.2, HIPP → NACC 0.25, NACC → CAUD 0.3, OFC → VMPFC 0.35, VMPFC → RAPHE 0.3, RAPHE → VMPFC 0.2"],
+                ["sadness and rumination", "SGACC → PCC 0.35, PCC → SGACC 0.3, SGACC → AMY 0.15, SGACC → HYP 0.25, SGACC → INS 0.2. the sad region and the self region feed each other (0.35 and 0.3), which is the loop that makes sadness keep going: that is rumination."],
+                ["action selection and movement", "DLPFC → CAUD 0.55, CAUD → THAL 0.4, PUT → THAL 0.4, THAL → PMC 0.55, PMC → M1 0.8, M1 → PUT 0.25, M1 → CB 0.75, CB → THAL 0.65, CB → PMC 0.45, CB → M1 0.35, PMC → CB 0.4, PPC → CB 0.3, PUT → CB 0.25, PPC → PMC 0.45, DLPFC → PMC 0.45, ACC → DLPFC 0.45, DLPFC → ACC 0.2, ACC → PMC 0.2, PUT → M1 0.15"],
+                ["memory and the default mode", "HIPP → PHC 0.5, PHC → HIPP 0.5, HIPP → PCC 0.35, PCC → HIPP 0.3, HIPP → VMPFC 0.3, PCC → MPFC 0.5, MPFC → PCC 0.5, TPJ → MPFC 0.35, TPJ → PCC 0.25, TPOLE → AMY 0.2, TPOLE → OFC 0.25, HIPP → TPOLE 0.2"],
+                ["arousal", "RF → THAL 0.5, LC → THAL 0.25, HYP → RF 0.3, HYP → LC 0.25, RF → LC 0.2, THAL → DLPFC 0.3, THAL → ACC 0.25"],
+                ["attention", "BF → HIPP 0.45, BF → ACC 0.3, BF → DLPFC 0.3, BF → PPC 0.3, BF → V1 0.25, BF → A1 0.25, BF → AMY 0.15, RF → BF 0.3, AMY → BF 0.25, ACC → BF 0.2"],
+              ]}
+            />
+            <p>
+              read the threat circuit and the brakes together and you can see the design. fear has 14 pathways pushing
+              it up and four pushing it down, all from the prefrontal cortex. the prefrontal pushes are slow (tau 0.15)
+              and the amygdala is fast (tau 0.05), so fear always wins the first half second and calm arrives
+              afterwards. that is not a rule i wrote, it is a consequence of the speeds and weights.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 18. every chemical effect on every region</H3>
+            <p>
+              this is the complete list of chemical terms added to x (each relative to the resting level of that
+              chemical, so at rest each term is zero). i showed the main ones above. this is all of them:
+            </p>
+            <Rows
+              rows={[
+                ["NACC", "+0.3·(dopamine − 0.1) + 0.15·(oxytocin − 0.1) + 0.15·(endorphin − 0.1)"],
+                ["VMPFC", "+0.2·(dopamine − 0.1) + 0.2·(serotonin − 0.4) − 0.2·(cortisol − 0.1)"],
+                ["DLPFC and CAUD", "+0.2·(dopamine − 0.1)"],
+                ["AMY", "+0.25·(cortisol − 0.1) − 0.3·(serotonin − 0.4) − 0.25·(oxytocin − 0.1) + 0.15·(NA − 0.1)"],
+                ["HIPP", "−0.15·(cortisol − 0.1) + 0.2·(acetylcholine − 0.15). stress hurts memory, attention helps it."],
+                ["MPFC and TPJ", "+0.15·(oxytocin − 0.1). trust makes him better at thinking about other minds."],
+                ["V1, V2V4, A1, IT", "+0.2·(acetylcholine − 0.15). attention sharpens the senses."],
+                ["M1, PMC, PPC", "+0.15·(adrenaline − 0.05). adrenaline readies the body."],
+                ["CB", "+0.2·(acetylcholine − 0.15) + 0.1·(dopamine − 0.1)"],
+                ["S1", "+0.2·(acetylcholine − 0.15) − 0.25·(endorphin − 0.1). endorphin dulls pain."],
+                ["ACC and INS", "−0.2·(endorphin − 0.1). endorphin dulls the 'ouch' and the gut feeling too."],
+                ["RAPHE", "+0.12·socialPos awake, −0.3 asleep"],
+                ["LC and RF", "−0.3·(melatonin − 0.1), and a further −0.5 (LC) or −0.4 (RF) when asleep"],
+                ["everything", "global gain (NA, adrenaline, melatonin) and global inhibition (GABA)"],
+              ]}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 19. real runs: what repetition and stress do</H3>
+            <p>
+              i ran the real brain (not a drawing of it) through two experiments to check the maths does what the
+              story says. these are the real numbers it printed.
+            </p>
+            <p>
+              <b>the same praise, six times, 8 seconds apart.</b> the rpe (the surprise) falls every time because the
+              brain learns to expect praise, and so does the dopamine spike. but the pleasure region does not fade at
+              all, because it is driven by the reward itself, not by the surprise.
+            </p>
+            <Rows
+              rows={[
+                ["praise 1", "expected 0.00, rpe 0.70, dopamine peak 0.70, accumbens peak 0.95"],
+                ["praise 2", "expected 0.10, rpe 0.59, dopamine peak 0.63, accumbens peak 0.94"],
+                ["praise 3", "expected 0.19, rpe 0.51, dopamine peak 0.60, accumbens peak 0.97"],
+                ["praise 4", "expected 0.27, rpe 0.43, dopamine peak 0.56, accumbens peak 0.97"],
+                ["praise 5", "expected 0.33, rpe 0.37, dopamine peak 0.53, accumbens peak 0.98"],
+                ["praise 6", "expected 0.39, rpe 0.31, dopamine peak 0.50, accumbens peak 0.98"],
+              ]}
+            />
+            <p>
+              so by the sixth praise the dopamine spike is 40 percent smaller than the first, but he still feels
+              happy. that is the real difference between liking and wanting: the thrill of surprise wears off, the
+              pleasure does not. you can also see the rule expected += 0.15 · rpe at work (0.70 · 0.15 = 0.105, then
+              0.10 + 0.15 · 0.59 = 0.19, and so on).
+            </p>
+            <p>
+              <b>four loud bangs, 2.5 seconds apart.</b> now the opposite happens. nothing calms down between them,
+              the stress builds and the alarm stays on:
+            </p>
+            <Rows
+              rows={[
+                ["bang 1", "expected 0.00, rpe −0.78, amygdala peak 0.99, noradrenaline 0.92, cortisol 0.20. emotions: neutral, then surprised, then fearful"],
+                ["bang 2", "expected −0.12, rpe −0.67, amygdala 1.00, noradrenaline 0.99, cortisol 0.29. stays fearful"],
+                ["bang 3", "expected −0.22, rpe −0.57, noradrenaline 1.00, cortisol 0.38"],
+                ["bang 4", "expected −0.30, rpe −0.48, noradrenaline 1.00, cortisol 0.45, dopamine down to 0.07 (below its resting 0.10)"],
+              ]}
+            />
+            <p>
+              look at the cortisol, it doubles from 0.20 to 0.45 in ten seconds, because its time constant is 18 s so
+              each bang adds to the last one instead of washing out. and look at dopamine, it falls below rest because
+              the dopamine equation has −0.25 · (cortisol − 0.2) in it: stress is literally taking away his
+              motivation. the rpe is also smaller each time (−0.78, −0.67, −0.57, −0.48) because he is learning to
+              expect bad things, the same expectation rule as the praise but in the other direction. these are the
+              two big effects i wanted from the maths, and they come out without anyone writing "if stressed then
+              less motivated".
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 20. the cheat sheet: every constant in one place</H3>
+            <Rows
+              rows={[
+                ["time steps", "sub step at most 0.02 s, frame at most 0.25 s"],
+                ["sigmoid", "centre 0.55, steepness 6"],
+                ["synaptic gain (SYN)", "0.6"],
+                ["fatigue", "weight 0.45, time constant 2.2 s"],
+                ["noise", "pull back 1 / 0.25 s, kick 0.08 · sqrt(dt)"],
+                ["global inhibition", "1.6 · mean lift · (0.6 + 1.2 · GABA)"],
+                ["other hemisphere", "35 percent of the weight"],
+                ["synapse scale", "min(sqrt(max(0.25, neurons / 80)), 4.5)"],
+                ["stimulus envelope", "attack 0.25 s, release 3 s, asleep × 0.15, laterality 1 ± 0.6"],
+                ["attention scaling g", "0.55 + 0.45 · intensity"],
+                ["startle", "decays with 0.8 s; set by novelty and threat"],
+                ["rpe", "decays with 2.5 s; expectation moves 0.15 of the error (0.12 for outside outcomes)"],
+                ["socialPos", "smoothed with 1.5 s"],
+                ["chemistry time constants", "dopamine 0.45, noradrenaline 1.0, acetylcholine 1.5, adrenaline 2.5, GABA 3, serotonin 6, oxytocin 6, endorphin 7, melatonin 8, cortisol 18 (seconds)"],
+                ["chemistry resting levels", "dopamine 0.10, serotonin 0.40, noradrenaline 0.10, adrenaline 0.05, cortisol 0.10, oxytocin 0.10, endorphin 0.10, acetylcholine 0.15, GABA 0.30, melatonin 0.10"],
+                ["plasticity", "every 0.15 s, rate 0.012, home pull 0.004, weights between 0.15× and 2.8× base + 0.15"],
+                ["emotion", "smoothing 0.25 s, threshold 0.20, must win by 15 percent, mood 55 s, intensity = score / 0.65"],
+                ["instinct race", "leak 1.2, push 2.2, competition 0.9, noise base 0.08, threshold 0.3 to 0.7, hold 1.2 to 2.6 s, leave after 1.5 s below 55 percent"],
+                ["action learning", "value rate 0.08, gain rate 0.04, trace 3 s, gains between 0.25 and 2.5, value between −1 and 1"],
+                ["predictive", "history 12, uncertainty floor 0.08, ceiling 0.95, learning rate 0.05 to 0.55, idle drift 0.015 and 0.02 per second"],
+              ]}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <H3>maths 21. the whole loop in one picture</H3>
+            <Eq>{`event ─► appraisal (13 numbers) ─► drives for regions ──┐
+                    │                                       ▼
+                    └─► outcome ─► rpe ─► dopamine ─► ┌─ regions (sigmoid, tau, synapses, brakes) ─┐
+                                   │                  │                                            │
+                                   ├─► action values  └─► chemistry ◄── ex(region) ◄───────────────┘
+                                   └─► weights (hebbian)         │
+                                                                 ▼
+          emotion readout (hysteresis) ◄── regions + mood      gain, per-region chemical terms
+          instinct race (threshold)    ◄── regions + learned values + epistemic value
+                    │
+                    ▼
+         label + reason ("because NACC 98%, VTA 64%") ─► the mind layer ─► what he says and does`}</Eq>
+            <p>
+              that is the entire emotional brain. 42 numbers, 10 chemicals, about 130 weights, 3 brakes, 1 sigmoid and
+              a handful of rules. every behaviour you see in the lab (the freeze before the flee, the sadness that
+              arrives after the fright, the happiness that fades even though the praise stays, the jumpy second bang)
+              is the same two equations running over and over.
+            </p>
+          </div>
+
           </div>
 
           <hr />
@@ -1460,6 +2370,50 @@ new weights:  sum(ratio·reward) = 0.75 − 0.08 + 1.60 + 0.10 = 2.37
               ("no reliable improvement on held-out rows, keeping the hand tuned weights") and changes nothing.
             </p>
 
+            <H3>the learning pipeline, with its real numbers</H3>
+            <p>
+              there are four steps, and only the first two are on by default. the learned part never changes the
+              safety parts, and with everything off the choices are identical to before (a test checks that).
+            </p>
+            <Rows
+              rows={[
+                ["1. the log", "every choice is saved as a row: the state (curiosity, social, boredom, valence, arousal, fatigue, person present, sleepiness, hour), the raw score parts of every action he could have picked, the pick, how likely the pick was, the reward and the next state. about 2000 rows are kept in memory and the last 300 in the browser. you can export them as a file."],
+                ["2. the offline tuner", "one multiplier per named part of the score, searched with the evolution strategy from before, accepted only on unseen rows. on 60 simulated days the held out reward went from about 0.077 to 0.101."],
+                ["3. the online residual (off by default)", "a tiny linear layer for each action over the 8 state numbers plus a constant. after each action it moves a little toward the reward it got."],
+                ["4. the offline net (off by default)", "a small neural net, 8 inputs, 12 hidden units and one output per action (9), trained on the log and loaded as a file."],
+              ]}
+            />
+            <p><b>step 3 in numbers.</b> the adjustment for an action is the dot product of its weights and the state,
+              clipped to ±0.25. each learning step is:</p>
+            <Eq>{`error  = clamp(reward, −1, 1) − prediction
+w_i    = clamp( w_i · (1 − 0.002) + 0.03 · error · feature_i ,  −0.6, 0.6 )
+
+example: he wandered with state [1, curiosity 0.8, social 0.2, boredom 0.5, valence 0.4,
+         arousal 0.3, fatigue 0.1, present 0, sleepiness 0.2] and got reward +0.4
+         prediction 0 → error 0.4
+         each weight moves by 0.03 · 0.4 · feature, so the constant gets +0.012, curiosity +0.0096 ...
+         sum of feature² = 2.23, so next time the same state predicts 0.012 · 2.23 = +0.027`}</Eq>
+            <p>
+              that is a step of about 7 percent of the gap, so he needs many similar good outcomes before it matters.
+              that is on purpose: a small learning rate (0.03), a pull back to zero (0.002), weights limited to ±0.6 and
+              the total to ±0.25. it cannot run away.
+            </p>
+            <p><b>step 4 in numbers.</b> the net learns a residual on top of the hand tuned score and not a new
+              policy. the training goal is reward weighted behaviour cloning: copy his own past choices that turned out
+              better than usual.</p>
+            <Eq>{`advantage = max(0, reward − the average reward of that action) + 0.02
+loss      = advantage-weighted cross-entropy of softmax(base score + net output) on the action he took
+settings  = 60 epochs, learning rate 0.05, softmax temperature 0.3, weight decay 0.0001,
+            at least 300 rows, 25% held out, net output clipped to ±0.5
+kept only if  held-out loss < the hand-tuned loss − 0.005`}</Eq>
+            <p>
+              the small 0.02 floor means even rows with no advantage still teach a little. on 60 simulated days it
+              lowered the held out loss from 0.350 to 0.302, while its agreement with what he really did went from
+              88.6 to 87.6 percent. that second number is the important one: it did not just copy him more closely,
+              it moved probability toward the choices that paid off. and again, "paid off" means his own reward, from
+              simulated days, so i would tune it again on real sessions.
+            </p>
+
           </div>
 
           <hr />
@@ -1548,6 +2502,26 @@ new weights:  sum(ratio·reward) = 0.75 − 0.08 + 1.60 + 0.10 = 2.37
               the idle clock when a person is seen existed but was never called anywhere, so the clock would never
               reset even with people walking past constantly. fixed now, and that is what makes "until someone
               interacts" actually true.
+            </p>
+
+            <H3>what each exploration goal really does</H3>
+            <p>
+              the four goals are not abstract. each one is a short list of the ordinary commands, and each head
+              move waits until the head has actually arrived, because a head command "completes" on the server at
+              once while the real head takes time:
+            </p>
+            <Rows
+              rows={[
+                ["scan area", "head to 30 degrees, wait until it arrives and stay 400 ms so the camera can capture a frame, then to 150 degrees and 400 ms, then back to the centre. without the waiting, the second target would overwrite the first and he would never look at 30 at all."],
+                ["investigate nearest unknown object", "head to the centre, wait for it, then walk forward for 800 ms and stop. there is no map or steering towards an object, so this is an honest approximation: face forward and creep a little. the same distance sensor gate applies."],
+                ["wander", "walk forward for 1200 ms, turn left or right (a coin flip) for 400 ms, stop."],
+                ["return and rest", "stop and put every servo in its safe pose."],
+              ]}
+            />
+            <p>
+              the loop proposes a new goal only every 25 seconds, 40 at most in a session, which is about 15 to 20
+              minutes. the moment a person is detected the task is cancelled, the walk is stopped and the servos go
+              safe, and the next cycle's normal rules (person in frame first) take over.
             </p>
 
             <H3>attention: deciding when to look</H3>
@@ -1728,6 +2702,48 @@ head = clamp(head + delta, 0, 180)`}
               and the head has its own limits: 0 to 180 degrees with 90 as centre, scanning only between 10 and 170 in
               steps of 8 degrees so it never slams into the ends, a top speed of 240 degrees a second (a full sweep
               takes 0.75 s), and a minimum move of 2 degrees, since smaller moves just make the servo buzz.
+            </p>
+
+            <H3>the browser eyes, ears and pixels, with the numbers</H3>
+            <p>
+              in the simulator the camera and microphone are opt in, and everything is processed on your device.
+              there are three tiers of seeing, and each one switches on only if the one before it works:
+            </p>
+            <Rows
+              rows={[
+                ["1. pixels (always)", "the video is shrunk to 80 by 60 gray values every 200 ms. motion is a pixel difference against a slowly updating background (background adapts at 2 percent a frame, only where nothing is moving). a pixel counts as motion above a difference of 18, as presence above 28, and presence needs at least 1.5 percent of the frame. if more than 60 percent of the frame changes at once, it is called a lighting change, not a person, so switching on a lamp does not look like someone arriving."],
+                ["2. objects", "a COCO-SSD model (80 kinds of everyday objects, loaded once and cached) runs every 650 ms. a detection is kept only above a confidence of 0.5 for a person and 0.55 for anything else."],
+                ["3. faces", "face-api looks for faces about every 0.8 s, but never more often than twice the time one look takes (it keeps a running average of 70 percent old and 30 percent new, and waits between 0.8 and 2.5 s). on a slow laptop it slows itself down and does not flood the machine."],
+              ]}
+            />
+            <p>
+              the camera is asked for 1280 by 720 at 30 fps. before that, 640 by 480 was the reason the preview looked
+              soft. when a frame is sent to the AI (only if you switch on frame sharing) it is shrunk to 512 pixels
+              wide and saved as a JPEG at quality 0.72.
+            </p>
+            <p>what the senses turn into events, and how often:</p>
+            <Rows
+              rows={[
+                ["sudden movement", "motion above 0.12 of the frame. then a 3.5 s cooldown."],
+                ["loud noise", "the microphone level (rms) must be above the larger of 0.15 and 5 times the room's usual level. the usual level is a slow average (98 percent old, 2 percent new), so a noisy room does not startle him all day. 4 s cooldown. and the microphone is muted while he speaks, so he never jumps at his own voice."],
+                ["lights out or on", "average brightness changing by more than 0.25 between now and a moment ago. 15 s cooldown."],
+                ["someone appeared", "a detection has to be seen twice in a row to count (so one bad frame does not create a person), and it is gone only after 3.5 s of not being seen."],
+              ]}
+            />
+            <p>
+              what he sees gets position words. the frame is cut into three: left of 0.38, right of 0.62 and centre
+              in between, and something that fills more than 12 percent of the frame is "near". colours come from a
+              few hue rules (below 0.16 brightness is black, low saturation is white or gray, then by hue angle: red,
+              brown, orange, yellow, green, teal, blue, purple, pink). he also remembers movement for 2 seconds and keeps
+              looking at a new object for 4.5 seconds, so his attention does not jump away instantly.
+            </p>
+            <p>
+              the 3D arena has its own "camera" so the virtual objects can be seen too. his field of view is 130
+              degrees and the range is 24 units. an object's position in the frame is{" "}
+              <code>0.5 + bearing / 130</code> (so dead ahead is 0.5 and the edge of view is at 0 or 1), its apparent
+              size shrinks with distance (kept between 0.035 and 0.55 of the frame), objects close to the middle and
+              near him score higher (0.35 to 0.98), and an object hiding behind a bigger one that overlaps it is dropped.
+              that is why he can say "a ball on my left" about something in the arena and not only on the camera.
             </p>
 
           </div>
@@ -2050,6 +3066,78 @@ strict threshold = 0.48`}</Eq>
               says is also a prompt problem, not only an audio one: replies are kept short and natural before they
               reach the voice.
             </p>
+
+            <H3>the dialogue engine, intent by intent</H3>
+            <p>
+              without the ai he still talks, and not from one canned list. the local engine is a pure function, no
+              model, that matches intents with patterns and builds the answer from his live state. it checks in this
+              order, and the first intent that fits answers:
+            </p>
+            <Rows
+              rows={[
+                ["1. a follow up", "if his last question was 'how are you?', your answer is read next. 'good, great, fine, awesome' gets 'glad to hear it'. 'bad, tired, sad, stressed' gets 'that sounds rough, i am here'."],
+                ["2. 'what is this?'", "also 'what am i holding', 'look at this'. with the camera off he says so. with an object in view he answers from the detection. if the confidence is 0.7 or more he says 'that looks like a red cup', below that 'i think that is a red cup'. with only pixels running he admits he can only see colours and movement."],
+                ["3. commands", "dance, walk, turn left, turn right, turn around, rest, look, look at me, play, come. he matches 'please', 'can you', 'let us' and 'i want you to' around them, then his own mind decides whether he feels like it."],
+                ["4. social basics", "hello, thanks, goodbye, jokes (he has a small pool, like the servo joke)."],
+                ["5. his hormones", "'how is your dopamine?' and 'what hormones do you have?' are answered from the real levels, as a percent and against the resting level."],
+                ["6. who and what", "who are you, what are you, what do you see (he lists what the camera shows, then what is in the arena), why did you do that (from the real score parts), what is your favourite."],
+                ["7. facts about you", "what is my name, what do i like, where do i live, from what he learned."],
+                ["8. feelings aimed at him", "things you say about him or to him, kind or unkind, get a reply and a small push on his mood."],
+                ["9. fallback", "a question he cannot answer gets an honest 'i do not know'. a plain statement gets an acknowledgement."],
+              ]}
+            />
+            <p>
+              <b>how he learns things from your sentence.</b> four patterns, written as regular expressions: "my name
+              is X / call me X" (the name is capitalised), "my favourite thing is Y" (stored as 'favorite thing'),
+              "i like or love or enjoy Z" (not if the thing is 'you') and "i live in or am from P" (stored as home).
+              facts are cut to a sensible length and stored, and they can fade later, as described before.
+            </p>
+            <p>
+              <b>he never repeats himself.</b> every reply pool goes through a simple rule: use a line he has not said
+              recently. if everything has been used, at least do not repeat the very last one. that is why asking
+              the same thing twice gets two different wordings.
+            </p>
+            <p>
+              <b>what he says when he sees something.</b> there is a small table of reactions to objects, and some of
+              them nudge his mood. a cat gives "a cat! i love cats" and mood +0.3, arousal +0.3. a dog is the same. a
+              bird is +0.2. a teddy bear is "a teddy bear! can i play too?" at +0.3. pizza and cake are +0.2 and he
+              says he is jealous. scissors and a knife are "careful with that" and a slightly negative mood of −0.1
+              with arousal +0.3. a laptop is "you are working, aren't you?", a book is "what are you reading?" and a
+              bottle is "staying hydrated?".
+            </p>
+            <p>
+              <b>how he says how he feels.</b> fifteen moods each have two or three ways of saying it, from
+              "really good, actually. something put me in a great mood" (happy) to "a bit scared, honestly. my heart
+              is racing" (afraid) and "sleepy. everything feels slow and soft". and why he did something has a plain
+              sentence for each of his nine actions, for example dance is "i felt like dancing. i was a little bored
+              and in a good mood", and call out is "it had been quiet and i wanted some company".
+            </p>
+
+            <H3>his voice follows his mood</H3>
+            <p>
+              the speech rate and pitch are picked from his mood first, and then refined by his hormones. a few of the
+              starting values, as rate and pitch where 1.0 is normal:
+            </p>
+            <Rows
+              rows={[
+                ["excited", "1.12 and 1.20, quick and high"],
+                ["startled", "1.20 and 1.25, the fastest and highest"],
+                ["afraid", "1.18 and 1.22"],
+                ["happy", "1.06 and 1.15"],
+                ["curious", "1.05 and 1.12"],
+                ["calm", "0.96 and 1.00"],
+                ["bored", "0.90 and 0.95"],
+                ["angry", "1.08 and 0.85, fast but low"],
+                ["sad", "0.86 and 0.88, slow and low"],
+                ["sleepy", "0.80 and 0.85, the slowest"],
+              ]}
+            />
+            <p>
+              and every person he knows gets a slightly different voice that never changes: the name is hashed to a
+              number, and that gives a rate between 0.94 and 1.06 and a pitch between 0.92 and 1.08. so he sounds a
+              little different when talking to different people, and the same each time.
+            </p>
+
           </div>
 
           <hr />
@@ -2879,6 +3967,32 @@ confidence = 1 − 0.437 = 0.56`}</Eq>
               password strength bar.
             </p>
             <ZoomImage src="/assets/blog/dashboard.png" alt="Dashboard" className="rounded-lg" />
+
+            <H3>the brain panel and the 3D brain, in detail</H3>
+            <p>
+              the brain panel is a rotating 3D brain whose regions light up as he feels things, the emotion that is
+              read out of that activity, and all ten chemicals as small bars. you can enlarge it, and press Esc to
+              close it. a few details that are easy to miss:
+            </p>
+            <Rows
+              rows={[
+                ["three views", "a left side view, a right side view and a view from the top. each turns slowly by itself: the sides at 0.26 radians a second (one full turn in about 24 seconds, in opposite directions) and the top at 0.18 (about 35 seconds), with a gentle nod up and down. drag to turn it by hand (0.012 radians per pixel sideways, 0.01 up and down, tilt limited to ±1.45). 1.5 seconds after you let go it starts turning again."],
+                ["what lights up", "each region is a cloud of tiny neurons. a neuron fires with a chance of (0.45 + 55·a²) per second, where a is the region's activity. at rest (a close to 0) that is about once every two seconds, and a region at 100 percent fires at about 55 times a second, which is what a busy real cortex does. a flash fades with a time constant of 0.13 s."],
+                ["smooth colour", "the glow of a group of regions rises in about 0.1 s and falls in about 1.6 s, so a startle appears sharply and fades like an afterimage."],
+                ["the chemicals", "they are drawn as hollow glowing rings that drift, clearly different from the round neurons, one colour each. the bars show each level as a percent, and hovering shows the name and what it does."],
+                ["emotion colours", "neutral grey, calm light blue, happy yellow, excited orange, curious cyan, surprised pink, fearful violet, angry red, disgusted green, sad blue and pain orange-red."],
+                ["it keeps up", "it is drawn in software, so it measures its own frame time. above 18 ms a frame, it lowers its quality by 0.03 a step. below 11 ms, it raises it by 0.01. the pixel density is capped at 1.25, which is still sharp and fast. so it works on a laptop and a phone."],
+                ["the lighting", "each neuron is shaded by the direction it faces, with a soft highlight, and the far side of the cortex is not even projected, because it would be hidden anyway. the camera is always framed on a 100 mm radius, so the brain never changes size while it turns."],
+              ]}
+            />
+            <p>
+              the lab has six tabs: a timeline (mood, energy and battery over time, with what he was doing and why,
+              and markers for events you can hover), what he knows about people and what he forgot, a personality
+              radar with sliders and presets, scenarios, his day in his own words, and a top down map where you drag
+              objects, hot and cold zones and the charger around. the scenario tab replays the same situation on a
+              fresh copy of him with two different personalities side by side and ticks a list of pass or fail checks for each.
+            </p>
+
           </div>
 
           <hr />

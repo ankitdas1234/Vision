@@ -17,7 +17,6 @@ for (const path of candidates) {
   }
 }
 
-
 const EnvSchema = z.object({
   // Required in production; falls back to a local dev default so tests/tooling
   // that don't touch the database can run without a full .env.

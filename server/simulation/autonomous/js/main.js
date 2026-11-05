@@ -591,10 +591,10 @@ function estop() {
     setModeUI("off");
     $("bodyState").textContent = "E-STOP";
     $("estop").classList.add("armed");
-    $("estop").textContent = "RESUME";
+    $("estop").textContent = "RESUME"; $("estop").setAttribute("aria-label", "Resume"); $("estop").title = "Resume: let him move again";
     addLog("system", "EMERGENCY STOP: all motion halted, mind switched off");
 }
-function resume() { stopped = false; Rig.setStopped(false); $("estop").classList.remove("armed"); $("estop").textContent = "E-STOP"; $("bodyState").textContent = "Idle"; addLog("system", "resumed"); }
+function resume() { stopped = false; Rig.setStopped(false); $("estop").classList.remove("armed"); $("estop").textContent = "E-STOP"; $("estop").setAttribute("aria-label", "Emergency stop"); $("estop").title = "Emergency stop (Esc)"; $("bodyState").textContent = "Idle"; addLog("system", "resumed"); }
 $("estop").addEventListener("click", () => ($("estop").classList.contains("armed") ? resume() : estop()));
 window.addEventListener("keydown", (e) => { if (e.key === "Escape")
     estop(); });

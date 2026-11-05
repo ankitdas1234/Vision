@@ -70,7 +70,15 @@ export const SIM_CLIENT_DIR = process.env.SIM_CLIENT_DIR ?? (() => {
 
 /** Static hosting for the client. Public on purpose: it's just HTML/JS/a model —
  * every API it calls below requires a login. */
-const staticFiles = express.static(SIM_CLIENT_DIR, { index: "index.html", maxAge: "1h" });
+// Pages, scripts and styles are re-checked on every load (a cheap "has it changed?" request that answers 304 when it has not), so a new
+// version shows up straight away instead of up to an hour later. Large assets (3D models, images, fonts, sounds) may be cached for an hour.
+const staticFiles = express.static(SIM_CLIENT_DIR, {
+  index: "index.html",
+  maxAge: "1h",
+  setHeaders(res, filePath) {
+    if (/\.(html?|m?js|css|json|map)$/i.test(filePath)) res.setHeader("Cache-Control", "no-cache");
+  },
+});
 
 /**
  * The simulator pages need a looser Content-Security-Policy than the API's helmet default:

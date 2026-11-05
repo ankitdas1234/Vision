@@ -61,7 +61,7 @@ function ensureLoaded(name) {
  */
 function resetMindControls() {
   for (const id of ["mindLeft", "mindRight"]) { const n = $(id); if (n) n.replaceWith(n.cloneNode(true)); }
-  const es = $("estop"); if (es) { es.classList.remove("armed"); es.textContent = "E-STOP"; }
+  const es = $("estop"); if (es) { es.classList.remove("armed"); es.textContent = "E-STOP"; es.setAttribute("aria-label", "Emergency stop"); es.title = "Emergency stop (Esc)"; }
   const lb = $("llmBadge"); if (lb) { lb.className = "badge"; const sp = lb.querySelector("span"); if (sp) sp.textContent = "LLM: checking…"; }
 }
 

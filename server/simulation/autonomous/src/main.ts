@@ -402,10 +402,10 @@ function estop() {
   Rig.setStopped(true); Rig.setWalking(false); Rig.setDancing(false);
   window.speechSynthesis?.cancel();
   brain.setMode("off"); setModeUI("off");
-  $("bodyState").textContent = "E-STOP"; $("estop").classList.add("armed"); $("estop").textContent = "RESUME";
+  $("bodyState").textContent = "E-STOP"; $("estop").classList.add("armed"); $("estop").textContent = "RESUME"; $("estop").setAttribute("aria-label", "Resume"); $("estop").title = "Resume: let him move again";
   addLog("system", "EMERGENCY STOP: all motion halted, mind switched off");
 }
-function resume() { stopped = false; Rig.setStopped(false); $("estop").classList.remove("armed"); $("estop").textContent = "E-STOP"; $("bodyState").textContent = "Idle"; addLog("system", "resumed"); }
+function resume() { stopped = false; Rig.setStopped(false); $("estop").classList.remove("armed"); $("estop").textContent = "E-STOP"; $("estop").setAttribute("aria-label", "Emergency stop"); $("estop").title = "Emergency stop (Esc)"; $("bodyState").textContent = "Idle"; addLog("system", "resumed"); }
 $("estop").addEventListener("click", () => ($("estop").classList.contains("armed") ? resume() : estop()));
 window.addEventListener("keydown", (e) => { if (e.key === "Escape") estop(); });
 if (shellDoc) { const ac = new AbortController(); addEventListener("pagehide", () => ac.abort()); shellDoc.addEventListener("keydown", (e) => { if (e.key === "Escape" && shellDoc.querySelector(".bar.mind-on")) estop(); }, { signal: ac.signal }); } // Esc while focus is on the shell's top bar; removed when this page unloads
